@@ -29,16 +29,11 @@ const roles = [
   "Principal",
 ];
 
-const classYears = [
-  "2018",
-  "2019",
-  "2020",
-  "2021",
-  "2022",
-  "2023",
-  "2024",
-  "2025",
-];
+// Generate dynamic class years: 5 previous years, current year, and 5 upcoming years
+const currentYear = new Date().getFullYear();
+const classYears = Array.from({ length: 11 }, (_, i) =>
+  (currentYear - 5 + i).toString()
+);
 
 const AddUser = () => {
   const [formData, setFormData] = useState({
@@ -69,6 +64,14 @@ const AddUser = () => {
     can_access_all_offices: false,
   });
 
+  const [errors, setErrors] = useState({
+    username: "",
+    password: "",
+    email: "",
+    role: "",
+    class_year: "",
+  });
+
   const params = useParams();
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
@@ -76,15 +79,79 @@ const AddUser = () => {
   const [loading, setLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
 
+  const validateForm = () => {
+    const newErrors = {
+      username: "",
+      password: "",
+      email: "",
+      role: "",
+      class_year: "",
+    };
+    let isValid = true;
+
+    // Username validation
+    if (!formData.username) {
+      newErrors.username = "Username is required";
+      isValid = false;
+    } else if (formData.username.length < 3) {
+      newErrors.username = "Username must be at least 3 characters long";
+      isValid = false;
+    }
+
+    // Password validation
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (!formData.password) {
+      newErrors.password = "Password is required";
+      isValid = false;
+    } else if (!passwordRegex.test(formData.password)) {
+      newErrors.password =
+        "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character";
+      isValid = false;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!formData.email) {
+      newErrors.email = "Email is required";
+      isValid = false;
+    } else if (!emailRegex.test(formData.email)) {
+      newErrors.email = "Please enter a valid email address";
+      isValid = false;
+    }
+
+    // Role validation
+    if (!formData.role) {
+      newErrors.role = "Role is required";
+      isValid = false;
+    }
+
+    // Class Year validation
+    if (!formData.class_year) {
+      newErrors.class_year = "Class Year is required";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
   const handleChange = (field) => (event) => {
     const value =
       event.target.type === "checkbox"
         ? event.target.checked
         : event.target.value;
     setFormData({ ...formData, [field]: value });
+    // Clear error when user starts typing
+    setErrors({ ...errors, [field]: "" });
   };
 
   const addUser = () => {
+    if (!validateForm()) {
+      enqueueSnackbar("Please fix the form errors", { variant: "error" });
+      return;
+    }
+
     console.log("add user", formData);
     setLoading(true);
     httpClient
@@ -155,7 +222,6 @@ const AddUser = () => {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          // bgcolor: "#fff",
         }}
       >
         <CircularProgress size={40} />
@@ -172,14 +238,12 @@ const AddUser = () => {
           bgcolor: "#fff",
         }}
       >
-        {/* <div className="d-flex justify-content-between"> */}
         <Button variant="contained" sx={{ mb: 2 }} onClick={() => navigate(-1)}>
           <ArrowBackIcon /> Back
         </Button>
         <Typography variant="h5" mb={3}>
           Add New User
         </Typography>
-        {/* </div> */}
 
         <Grid container spacing={4}>
           <Grid item xs={12}>
@@ -188,6 +252,8 @@ const AddUser = () => {
               label="Username"
               value={formData.username}
               onChange={handleChange("username")}
+              error={!!errors.username}
+              helperText={errors.username}
             />
           </Grid>
           <Grid item xs={12}>
@@ -197,30 +263,22 @@ const AddUser = () => {
               type="password"
               value={formData.password}
               onChange={handleChange("password")}
+              error={!!errors.password}
+              helperText={errors.password}
             />
           </Grid>
-          <Grid
-            item
-            xs={12}
-            sx={{
-              width: "15rem",
-            }}
-          >
+          <Grid item xs={12} sx={{ width: "15rem" }}>
             <TextField
               fullWidth
               label="Email"
               value={formData.email}
               onChange={handleChange("email")}
+              error={!!errors.email}
+              helperText={errors.email}
             />
           </Grid>
-          <Grid
-            item
-            xs={12}
-            sx={{
-              width: "12rem",
-            }}
-          >
-            <FormControl fullWidth>
+          <Grid item xs={12} sx={{ width: "12rem" }}>
+            <FormControl fullWidth error={!!errors.role}>
               <InputLabel>Role</InputLabel>
               <Select
                 value={formData.role}
@@ -233,17 +291,16 @@ const AddUser = () => {
                   </MenuItem>
                 ))}
               </Select>
+              {errors.role && (
+                <Typography color="error" variant="caption">
+                  {errors.role}
+                </Typography>
+              )}
             </FormControl>
           </Grid>
 
-          <Grid
-            item
-            xs={12}
-            sx={{
-              width: "8rem",
-            }}
-          >
-            <FormControl fullWidth>
+          <Grid item xs={12} sx={{ width: "8rem" }}>
+            <FormControl fullWidth error={!!errors.class_year}>
               <InputLabel>Class Year</InputLabel>
               <Select
                 value={formData.class_year}
@@ -256,16 +313,15 @@ const AddUser = () => {
                   </MenuItem>
                 ))}
               </Select>
+              {errors.class_year && (
+                <Typography color="error" variant="caption">
+                  {errors.class_year}
+                </Typography>
+              )}
             </FormControl>
           </Grid>
 
-          <Grid
-            item
-            xs={12}
-            sx={{
-              width: "50%",
-            }}
-          >
+          <Grid item xs={12} sx={{ width: "50%" }}>
             <TextField
               fullWidth
               label="Description"
@@ -294,6 +350,7 @@ const AddUser = () => {
               color="primary"
               onClick={addUser}
               fullWidth
+              disabled={loading}
             >
               {loading ? (
                 <CircularProgress size={24} color="inherit" />

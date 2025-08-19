@@ -29,16 +29,11 @@ const roles = [
   "Principal",
 ];
 
-const classYears = [
-  "2018",
-  "2019",
-  "2020",
-  "2021",
-  "2022",
-  "2023",
-  "2024",
-  "2025",
-];
+// Generate dynamic class years: 5 previous years, current year, and 5 upcoming years
+const currentYear = new Date().getFullYear();
+const classYears = Array.from({ length: 11 }, (_, i) =>
+  (currentYear - 5 + i).toString()
+);
 
 const EditUser = (props) => {
   const [formData, setFormData] = useState({
@@ -83,22 +78,6 @@ const EditUser = (props) => {
     setFormData({ ...formData, [field]: value });
   };
 
-  // const addUser = () => {
-  //   setLoading(true);
-  //   httpClient
-  //     .post(`/user/create`, formData)
-  //     .then(() => {
-  //       enqueueSnackbar("User added successfully", { variant: "success" });
-  //     })
-  //     .catch((err) => {
-  //       enqueueSnackbar("Error adding user", { variant: "error" });
-  //       console.error(err);
-  //     })
-  //     .finally(() => setLoading(false));
-  // };
-
-  //function to get user data
-
   const getUser = () => {
     httpClient
       .get(`/user/get-single-user/${params?.id}`)
@@ -115,9 +94,9 @@ const EditUser = (props) => {
     httpClient
       .patch(`user/update-user/${params.id}`, formData)
       .then(() => {
-        //get data and update in local storage for permissions use
         getUser();
         enqueueSnackbar("User updated successfully", { variant: "success" });
+        navigate(-1);
       })
       .catch((err) => {
         enqueueSnackbar("Error updating user", { variant: "error" });
@@ -181,7 +160,6 @@ const EditUser = (props) => {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          // bgcolor: "#fff",
         }}
       >
         <CircularProgress size={40} />
@@ -198,14 +176,12 @@ const EditUser = (props) => {
           bgcolor: "#fff",
         }}
       >
-        {/* <div className="d-flex justify-content-between"> */}
         <Button variant="contained" sx={{ mb: 2 }} onClick={() => navigate(-1)}>
           <ArrowBackIcon /> Back
         </Button>
         <Typography variant="h5" mb={3}>
-          Add New User
+          Edit User
         </Typography>
-        {/* </div> */}
 
         <Grid container spacing={4}>
           <Grid item xs={12}>
@@ -225,13 +201,7 @@ const EditUser = (props) => {
               onChange={handleChange("password")}
             />
           </Grid>
-          <Grid
-            item
-            xs={12}
-            sx={{
-              width: "15rem",
-            }}
-          >
+          <Grid item xs={12} sx={{ width: "15rem" }}>
             <TextField
               fullWidth
               label="Email"
@@ -239,13 +209,7 @@ const EditUser = (props) => {
               onChange={handleChange("email")}
             />
           </Grid>
-          <Grid
-            item
-            xs={12}
-            sx={{
-              width: "12rem",
-            }}
-          >
+          <Grid item xs={12} sx={{ width: "12rem" }}>
             <FormControl fullWidth>
               <InputLabel>Role</InputLabel>
               <Select
@@ -262,13 +226,7 @@ const EditUser = (props) => {
             </FormControl>
           </Grid>
 
-          <Grid
-            item
-            xs={12}
-            sx={{
-              width: "7rem",
-            }}
-          >
+          <Grid item xs={12} sx={{ width: "7rem" }}>
             <FormControl fullWidth>
               <InputLabel>Class Year</InputLabel>
               <Select
@@ -285,13 +243,7 @@ const EditUser = (props) => {
             </FormControl>
           </Grid>
 
-          <Grid
-            item
-            xs={12}
-            sx={{
-              width: "50%",
-            }}
-          >
+          <Grid item xs={12} sx={{ width: "50%" }}>
             <TextField
               fullWidth
               label="Description"

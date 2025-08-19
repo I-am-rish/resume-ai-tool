@@ -84,7 +84,7 @@ const StudentContainer = () => {
         >
           <Tab label="Student Details" />
           <Tab label="Order History" />
-          <Tab label="Merged Students" />
+          {/* <Tab label="Merged Students" /> */}
         </Tabs>
 
         {/* Tab Content */}
@@ -99,11 +99,11 @@ const StudentContainer = () => {
               <OrderHistory />
             </Box>
           )}
-          {tabValue === 2 && (
+          {/* {tabValue === 2 && (
             <Box sx={{ fontSize: { xs: "0.85rem", sm: "1rem" } }}>
               <MergedStudent />
             </Box>
-          )}
+          )} */}
         </Box>
       </Paper>
     </Container>

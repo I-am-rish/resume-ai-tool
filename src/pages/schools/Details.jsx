@@ -1,5 +1,3 @@
-import httpClient from "@/utils/httpClinet";
-import { LoadingButton } from "@mui/lab";
 import {
   Box,
   Button,
@@ -11,10 +9,16 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useSnackbar } from "notistack";
+import { LoadingButton } from "@mui/lab";
 import { useEffect, useState } from "react";
+import { useSnackbar } from "notistack";
+import httpClient from "@/utils/httpClinet";
 
 const Details = ({ school = {}, loading = false }) => {
+  const { enqueueSnackbar } = useSnackbar();
+  const [saving, setSaving] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState(null);
+
   const [formData, setFormData] = useState({
     school_name: school.school_name || "",
     customer_number: school.customer_number || "",
@@ -31,11 +35,18 @@ const Details = ({ school = {}, loading = false }) => {
       school.charge_shipping_on_capsAnd_gowns || 0,
     NoShippingCharges: school.NoShippingCharges || 0,
     tax_on_shipping: school.tax_on_shipping || 0,
-    school_logo: school.school_logo || null, // Changed from school_logo to logo
+    school_logo: school.school_logo || null,
   });
 
-  const [saving, setSaving] = useState(false);
-  const { enqueueSnackbar } = useSnackbar();
+  const [errors, setErrors] = useState({
+    school_name: "",
+    address1: "",
+    city: "",
+    state: "",
+    county: "",
+    tax_rate: "",
+    school_logo: "",
+  });
 
   const handleChange = (field) => (event) => {
     const value =
@@ -45,11 +56,106 @@ const Details = ({ school = {}, loading = false }) => {
         ? event.target.files?.[0] || null
         : event.target.value;
     setFormData((prevData) => ({ ...prevData, [field]: value }));
+    setErrors({ ...errors, [field]: "" });
+  };
+
+  const handleFileChange = (event) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // Validate file type
+      const validTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+      if (!validTypes.includes(file.type)) {
+        setErrors({
+          ...errors,
+          school_logo: "Invalid file type. Use jpg, jpeg, png, or webp.",
+        });
+        setPreviewUrl(null);
+        setFormData({ ...formData, school_logo: null });
+        return;
+      }
+
+      // Validate file size (100KB = 100 * 1024 bytes)
+      // if (file.size > 100 * 1024) {
+      //   setErrors({ ...errors, school_logo: "File size exceeds 100KB limit." });
+      //   setPreviewUrl(null);
+      //   setFormData({ ...formData, school_logo: null });
+      //   return;
+      // }
+
+      // Set file and preview
+      setFormData({ ...formData, school_logo: file });
+      setErrors({ ...errors, school_logo: "" });
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewUrl(reader.result);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setPreviewUrl(null);
+      setFormData({ ...formData, school_logo: null });
+      setErrors({ ...errors, school_logo: "" });
+    }
+  };
+
+  const validateForm = () => {
+    let isValid = true;
+    const newErrors = {
+      school_name: "",
+      address1: "",
+      city: "",
+      state: "",
+      county: "",
+      tax_rate: "",
+      school_logo: "",
+    };
+
+    if (!formData.school_name.trim()) {
+      newErrors.school_name = "School Name is required";
+      isValid = false;
+    }
+    if (!formData.address1.trim()) {
+      newErrors.address1 = "Address 1 is required";
+      isValid = false;
+    }
+    if (!formData.city.trim()) {
+      newErrors.city = "City is required";
+      isValid = false;
+    }
+    if (!formData.state.trim()) {
+      newErrors.state = "State is required";
+      isValid = false;
+    }
+    if (!formData.county.trim()) {
+      newErrors.county = "County is required";
+      isValid = false;
+    }
+    if (!formData.tax_rate.trim()) {
+      newErrors.tax_rate = "Tax Rate is required";
+      isValid = false;
+    } else if (
+      isNaN(formData.tax_rate) ||
+      parseFloat(formData.tax_rate) < 0 ||
+      !/^\d*\.?\d*$/.test(formData.tax_rate)
+    ) {
+      newErrors.tax_rate =
+        "Tax Rate must be a valid positive number (e.g., 7.00)";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
   };
 
   const saveSchool = () => {
     if (!school.schoolID) {
       enqueueSnackbar("School ID is missing", { variant: "error" });
+      return;
+    }
+
+    if (!validateForm()) {
+      enqueueSnackbar("Please fill all required fields correctly", {
+        variant: "error",
+      });
       return;
     }
 
@@ -61,7 +167,6 @@ const Details = ({ school = {}, loading = false }) => {
       }
     });
 
-    // Log the logo to verify
     console.log("save school payload logo => ", payload.get("school_logo"));
 
     httpClient
@@ -80,7 +185,6 @@ const Details = ({ school = {}, loading = false }) => {
       });
   };
 
-  // Sync formData with school prop when it changes, preserving file input
   useEffect(() => {
     setFormData((prevData) => {
       const newData = { ...prevData };
@@ -110,12 +214,13 @@ const Details = ({ school = {}, loading = false }) => {
         newData.NoShippingCharges = school.NoShippingCharges || 0;
       if (school.tax_on_shipping !== undefined)
         newData.tax_on_shipping = school.tax_on_shipping || 0;
-      // Only update logo if it's not a file (preserve user-selected file)
       if (
         school.school_logo !== undefined &&
         !(prevData.school_logo instanceof File)
-      )
+      ) {
         newData.school_logo = school.school_logo || null;
+        setPreviewUrl(school.school_logo || null);
+      }
       return newData;
     });
   }, [school]);
@@ -138,6 +243,8 @@ const Details = ({ school = {}, loading = false }) => {
               label="School Name"
               value={formData.school_name}
               onChange={handleChange("school_name")}
+              error={!!errors.school_name}
+              helperText={errors.school_name}
             />
           </Grid>
           <Grid item xs={6}>
@@ -152,9 +259,12 @@ const Details = ({ school = {}, loading = false }) => {
           <Grid item xs={6}>
             <TextField
               fullWidth
+              required
               label="Address 1"
               value={formData.address1}
               onChange={handleChange("address1")}
+              error={!!errors.address1}
+              helperText={errors.address1}
             />
           </Grid>
           <Grid item xs={6}>
@@ -169,17 +279,23 @@ const Details = ({ school = {}, loading = false }) => {
           <Grid item xs={6}>
             <TextField
               fullWidth
+              required
               label="City"
               value={formData.city}
               onChange={handleChange("city")}
+              error={!!errors.city}
+              helperText={errors.city}
             />
           </Grid>
           <Grid item xs={3}>
             <TextField
               fullWidth
+              required
               label="State"
               value={formData.state}
               onChange={handleChange("state")}
+              error={!!errors.state}
+              helperText={errors.state}
             />
           </Grid>
           <Grid item xs={3}>
@@ -194,17 +310,23 @@ const Details = ({ school = {}, loading = false }) => {
           <Grid item xs={6}>
             <TextField
               fullWidth
+              required
               label="County"
               value={formData.county}
               onChange={handleChange("county")}
+              error={!!errors.county}
+              helperText={errors.county}
             />
           </Grid>
           <Grid item xs={6}>
             <TextField
               fullWidth
+              required
               label="Tax Rate (e.g., 6.50 or 7.00)"
               value={formData.tax_rate}
               onChange={handleChange("tax_rate")}
+              error={!!errors.tax_rate}
+              helperText={errors.tax_rate}
               InputProps={{
                 endAdornment: <InputAdornment position="end">%</InputAdornment>,
               }}
@@ -221,15 +343,6 @@ const Details = ({ school = {}, loading = false }) => {
           </Grid>
 
           <Grid item xs={12}>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={!!formData.announcements_require_package}
-                  onChange={handleChange("announcements_require_package")}
-                />
-              }
-              label="Announcements Require Package"
-            />
             <FormControlLabel
               control={
                 <Checkbox
@@ -269,13 +382,39 @@ const Details = ({ school = {}, loading = false }) => {
                 hidden
                 type="file"
                 accept="image/*"
-                onChange={handleChange("school_logo")} // Changed from school_logo to logo
+                onChange={handleFileChange}
               />
             </Button>
-            <Typography variant="caption" display="block" gutterBottom>
+            <Typography variant="caption" display="block" sx={{ mt: 1, mb: 1 }}>
               (jpg, jpeg, png, webp images only) <br />
               (Maximum File Size: 100KB)
             </Typography>
+            {errors.school_logo && (
+              <Typography
+                variant="caption"
+                color="error"
+                display="block"
+                sx={{ mb: 1 }}
+              >
+                {errors.school_logo}
+              </Typography>
+            )}
+            {previewUrl && (
+              <Box sx={{ mt: 2, maxWidth: 200 }}>
+                <Typography variant="caption" display="block" sx={{ mb: 1 }}>
+                  Preview:
+                </Typography>
+                <img
+                  src={previewUrl}
+                  alt="Logo Preview"
+                  style={{
+                    maxWidth: "100%",
+                    maxHeight: "100px",
+                    objectFit: "contain",
+                  }}
+                />
+              </Box>
+            )}
           </Grid>
         </Grid>
       )}
@@ -307,7 +446,7 @@ const Details = ({ school = {}, loading = false }) => {
       >
         <LoadingButton
           variant="contained"
-          loading={saving} // Use saving for the button loader
+          loading={saving}
           onClick={saveSchool}
           disabled={loading || saving}
         >

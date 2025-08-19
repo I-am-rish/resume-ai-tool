@@ -3,6 +3,7 @@ import { Box, Button, Typography,  } from "@mui/material";
 import { useParams } from "react-router-dom";
 import httpClient from "@/utils/httpClinet";
 import { LoadingButton } from "@mui/lab";
+import { useSnackbar } from "notistack";
 
 const AnnouncementImage = ({ school = {}, loading = false }) => {
   const [previewUrl, setPreviewUrl] = useState(null);
@@ -10,6 +11,7 @@ const AnnouncementImage = ({ school = {}, loading = false }) => {
   const [uploading, setUploading] = useState(false); // New state for upload loading
   const fileInputRef = useRef(null);
   const params = useParams();
+   const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
     if (school.announcement_image) {
@@ -39,9 +41,15 @@ const AnnouncementImage = ({ school = {}, loading = false }) => {
         .patch(`/school/update-school/${params.id}`, fData)
         .then((res) => {
           console.log("res => ", res);
+          enqueueSnackbar("Image uploaded successfully", {
+            variant: "success",
+          })
         })
         .catch((err) => {
           console.log("err => ", err);
+          enqueueSnackbar("Error uploading image", {
+            variant: "error",
+          })
         })
         .finally(() => {
           setUploading(false); // Stop the loader
