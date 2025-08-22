@@ -19,7 +19,6 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { useSnackbar } from "notistack";
-import { LoadingButton } from "@mui/lab";
 import httpClient from "@/utils/httpClinet";
 
 const PackageList = () => {
@@ -29,6 +28,7 @@ const PackageList = () => {
   const [selectedRows, setSelectedRows] = useState([]);
   const [openAddPopup, setOpenAddPopup] = useState(false);
   const [openEditPopup, setOpenEditPopup] = useState(false);
+
   const [newPackageData, setNewPackageData] = useState({
     name: "",
     package_sku: "",
@@ -36,7 +36,7 @@ const PackageList = () => {
     package_image: null,
     schoolIds: [],
     productIds: [],
-    package_typeID: "",
+    package_typeId: "",
     requires_handling: 0,
     vposOnly: 0,
     taxable: 0,
@@ -49,7 +49,7 @@ const PackageList = () => {
     package_image: null,
     schoolIds: [],
     productIds: [],
-    package_typeID: "",
+    package_typeId: "",
     requires_handling: 0,
     vposOnly: 0,
     taxable: 0,
@@ -60,23 +60,16 @@ const PackageList = () => {
   const navigate = useNavigate();
   const [schoolList, setSchoolList] = useState([]);
   const [productList, setProductList] = useState([]);
-  // Static package types (replace with API if available)
   const [packageTypes, setPackageTypes] = useState([]);
-  // const packageTypes = [
-  //   { id: 1, name: "Standard" },
-  //   { id: 2, name: "Premium" },
-  // ];
-  // Pagination states
-  const [page, setPage] = useState(1); // 1-based page index
+  const [page, setPage] = useState(1);
   const [pageLimit, setPageLimit] = useState(10);
   const [totalRows, setTotalRows] = useState(0);
 
-  // Define MenuProps for scrollable dropdown
   const menuProps = {
     PaperProps: {
       style: {
-        maxHeight: 300, // Set maximum height for dropdown
-        overflowY: "auto", // Enable vertical scrolling
+        maxHeight: 300,
+        overflowY: "auto",
       },
     },
   };
@@ -85,8 +78,17 @@ const PackageList = () => {
     httpClient
       .get(`/package/get-all-types/hj-tampa`)
       .then((res) => {
-        console.log("Package types:", res.data?.data);
-        setPackageTypes(res.data?.data || []);
+        const types = res.data?.data || [];
+        console.log("Package types:", types);
+        setPackageTypes(
+          types
+            // .filter((type) => type.id != null && !isNaN(Number(type.id)))
+            .map((type) => ({
+              id: Number(type.package_typeId),
+              package_typeId: Number(type.package_typeId),
+              package_type_name: type.package_type_name,
+            }))
+        );
       })
       .catch((err) => {
         console.error("Failed to fetch package types:", err);
@@ -94,13 +96,18 @@ const PackageList = () => {
       });
   }, []);
 
-  // Fetch schools
   useEffect(() => {
     httpClient
       .get("/school/get-all-school/hj-tampa")
       .then((res) => {
-        console.log("School list:", res.data?.data);
-        setSchoolList(res.data?.data || []);
+        const schools = res.data?.data || [];
+        console.log("School list:", schools);
+        setSchoolList(
+          schools.filter(
+            (school) =>
+              school.schoolID != null && !isNaN(Number(school.schoolID))
+          )
+        );
       })
       .catch((err) => {
         console.error("Failed to fetch schools:", err);
@@ -108,13 +115,18 @@ const PackageList = () => {
       });
   }, []);
 
-  // Fetch products
   useEffect(() => {
     httpClient
       .get(`/product/get-all-products?wid=hj-tampa`)
       .then((res) => {
-        console.log("Product list:", res.data?.data);
-        setProductList(res.data?.data || []);
+        const products = res.data?.data?.products || [];
+        console.log("Product list:", products);
+        setProductList(
+          products.filter(
+            (product) =>
+              product.productID != null && !isNaN(Number(product.productID))
+          )
+        );
       })
       .catch((err) => {
         console.error("Failed to fetch products:", err);
@@ -136,7 +148,7 @@ const PackageList = () => {
       package_image: null,
       schoolIds: [],
       productIds: [],
-      package_typeID: "",
+      package_typeId: "",
       requires_handling: 0,
       vposOnly: 0,
       taxable: 0,
@@ -241,7 +253,7 @@ const PackageList = () => {
       });
       return;
     }
-    if (!newPackageData.package_typeID) {
+    if (!newPackageData.package_typeId) {
       enqueueSnackbar("Package Type is required", { variant: "error" });
       return;
     }
@@ -303,7 +315,7 @@ const PackageList = () => {
       });
       return;
     }
-    if (!editPackageData.package_typeID) {
+    if (!editPackageData.package_typeId) {
       enqueueSnackbar("Package Type is required", { variant: "error" });
       return;
     }
@@ -343,9 +355,9 @@ const PackageList = () => {
         `/package/get-all-package/hj-tampa?page=${page}&pageLimit=${pageLimit}`
       )
       .then((res) => {
-        console.log("Packages response:", res.data); // Debug API response
+        console.log("Packages response:", res.data);
         setRows(
-          res?.data?.data?.map((pack) => ({
+          res?.data?.data?.packages?.map((pack) => ({
             id: pack.packageID,
             package_image: pack.package_image || "N/A",
             name: pack.name || "N/A",
@@ -359,12 +371,12 @@ const PackageList = () => {
             productIds: (pack.products || []).map((product) =>
               Number(product.productID)
             ),
-            package_typeID: pack.package_typeID || "",
+            package_typeId: Number(pack.package_typeId) || "",
             requires_handling: pack.requires_handling || 0,
             vposOnly: pack.vposOnly || 0,
           }))
         );
-        setTotalRows(res?.data?.total || 0);
+        setTotalRows(res?.data?.data?.total || 0);
       })
       .catch((err) => {
         console.error("Refresh packages error:", err);
@@ -378,7 +390,7 @@ const PackageList = () => {
       .get(`/package/get-single-package/${row.id}`)
       .then((res) => {
         const pack = res.data?.data;
-        console.log("Single package response:", res.data); // Debug API response
+        console.log("Single package response:", res.data);
         if (!pack) {
           enqueueSnackbar("Failed to fetch package data", { variant: "error" });
           return;
@@ -395,7 +407,7 @@ const PackageList = () => {
           productIds: (pack.products || []).map((product) =>
             Number(product.productID)
           ),
-          package_typeID: pack.package_typeID || "",
+          package_typeId: Number(pack.package_typeId) || "",
           requires_handling: pack.requires_handling ? 1 : 0,
           vposOnly: pack.vposOnly ? 1 : 0,
           taxable: pack.taxable ? 1 : 0,
@@ -557,7 +569,7 @@ const PackageList = () => {
           paginationModel={{ page: page - 1, pageSize: pageLimit }}
           pageSizeOptions={[10, 25, 50]}
           onPaginationModelChange={(model) => {
-            setPage(model.page + 1); // Convert to 1-based index
+            setPage(model.page + 1);
             setPageLimit(model.pageSize);
           }}
           disableRowSelectionOnClick
@@ -647,19 +659,23 @@ const PackageList = () => {
                 }
                 MenuProps={menuProps}
               >
-                {schoolList.map((school) => (
-                  <MenuItem
-                    key={school?.schoolID}
-                    value={Number(school?.schoolID)}
-                  >
-                    <Checkbox
-                      checked={newPackageData.schoolIds.includes(
-                        Number(school?.schoolID)
-                      )}
-                    />
-                    {school?.school_name || `Unknown (${school?.schoolID})`}
-                  </MenuItem>
-                ))}
+                {schoolList.length > 0 ? (
+                  schoolList.map((school) => (
+                    <MenuItem
+                      key={school?.schoolID || `school-${Math.random()}`}
+                      value={Number(school?.schoolID)}
+                    >
+                      <Checkbox
+                        checked={newPackageData.schoolIds.includes(
+                          Number(school?.schoolID)
+                        )}
+                      />
+                      {school?.school_name || `Unknown (${school?.schoolID})`}
+                    </MenuItem>
+                  ))
+                ) : (
+                  <MenuItem disabled>No schools available</MenuItem>
+                )}
               </Select>
             </FormControl>
             <FormControl fullWidth margin="normal" required>
@@ -674,7 +690,7 @@ const PackageList = () => {
                     ? selected
                         .map(
                           (id) =>
-                            productList.find(
+                            productList?.find(
                               (product) => product.productID === Number(id)
                             )?.name || `Unknown (${id})`
                         )
@@ -683,34 +699,48 @@ const PackageList = () => {
                 }
                 MenuProps={menuProps}
               >
-                {productList.map((product) => (
-                  <MenuItem
-                    key={product?.productID}
-                    value={Number(product?.productID)}
-                  >
-                    <Checkbox
-                      checked={newPackageData.productIds.includes(
-                        Number(product?.productID)
-                      )}
-                    />
-                    {product?.name || `Unknown (${product?.productID})`}
-                  </MenuItem>
-                ))}
+                {productList.length > 0 ? (
+                  productList.map((product) => (
+                    <MenuItem
+                      key={product?.productID || `product-${Math.random()}`}
+                      value={Number(product?.productID)}
+                    >
+                      <Checkbox
+                        checked={newPackageData.productIds.includes(
+                          Number(product?.productID)
+                        )}
+                      />
+                      {product?.name || `Unknown (${product?.productID})`}
+                    </MenuItem>
+                  ))
+                ) : (
+                  <MenuItem disabled>No products available</MenuItem>
+                )}
               </Select>
             </FormControl>
             <FormControl fullWidth margin="normal" required>
               <InputLabel>Package Type</InputLabel>
               <Select
-                value={newPackageData.package_typeID}
+                value={newPackageData.package_typeId || ""}
                 label="Package Type"
-                name="package_typeID"
-                onChange={handleAddInputChange}
+                name="package_typeId"
+                onChange={(e) => {
+                  setNewPackageData((prevData) => ({
+                    ...prevData,
+                    package_typeId: Number(e.target.value),
+                  }));
+                }}
+                MenuProps={menuProps}
               >
-                {packageTypes.map((type) => (
-                  <MenuItem key={type.id} value={type.id}>
-                    {type.name}
-                  </MenuItem>
-                ))}
+                {packageTypes.length > 0 ? (
+                  packageTypes.map((type, index) => (
+                    <MenuItem key={index + 1} value={type.package_typeId}>
+                      {type.package_type_name}
+                    </MenuItem>
+                  ))
+                ) : (
+                  <MenuItem disabled>No package types available</MenuItem>
+                )}
               </Select>
             </FormControl>
             <FormControlLabel
@@ -778,7 +808,7 @@ const PackageList = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseAddPopup}>Cancel</Button>
-          <LoadingButton
+          <Button
             variant="contained"
             loading={saving}
             onClick={handleCreatePackage}
@@ -790,11 +820,11 @@ const PackageList = () => {
               Number(newPackageData.packageprice) <= 0 ||
               newPackageData.schoolIds.length === 0 ||
               newPackageData.productIds.length === 0 ||
-              !newPackageData.package_typeID
+              !newPackageData.package_typeId
             }
           >
             Create Package
-          </LoadingButton>
+          </Button>
         </DialogActions>
       </Dialog>
 
@@ -858,19 +888,23 @@ const PackageList = () => {
                 }
                 MenuProps={menuProps}
               >
-                {schoolList.map((school) => (
-                  <MenuItem
-                    key={school?.schoolID}
-                    value={Number(school?.schoolID)}
-                  >
-                    <Checkbox
-                      checked={editPackageData.schoolIds.includes(
-                        Number(school?.schoolID)
-                      )}
-                    />
-                    {school?.school_name || `Unknown (${school?.schoolID})`}
-                  </MenuItem>
-                ))}
+                {schoolList.length > 0 ? (
+                  schoolList.map((school) => (
+                    <MenuItem
+                      key={school?.schoolID || `school-${Math.random()}`}
+                      value={Number(school?.schoolID)}
+                    >
+                      <Checkbox
+                        checked={editPackageData.schoolIds.includes(
+                          Number(school?.schoolID)
+                        )}
+                      />
+                      {school?.school_name || `Unknown (${school?.schoolID})`}
+                    </MenuItem>
+                  ))
+                ) : (
+                  <MenuItem disabled>No schools available</MenuItem>
+                )}
               </Select>
             </FormControl>
             <FormControl fullWidth margin="normal" required>
@@ -885,7 +919,7 @@ const PackageList = () => {
                     ? selected
                         .map(
                           (id) =>
-                            productList.find(
+                            productList?.find(
                               (product) => product.productID === Number(id)
                             )?.name || `Unknown (${id})`
                         )
@@ -894,34 +928,51 @@ const PackageList = () => {
                 }
                 MenuProps={menuProps}
               >
-                {productList.map((product) => (
-                  <MenuItem
-                    key={product?.productID}
-                    value={Number(product?.productID)}
-                  >
-                    <Checkbox
-                      checked={editPackageData.productIds.includes(
-                        Number(product?.productID)
-                      )}
-                    />
-                    {product?.name || `Unknown (${product?.productID})`}
-                  </MenuItem>
-                ))}
+                {productList.length > 0 ? (
+                  productList.map((product) => (
+                    <MenuItem
+                      key={product?.productID || `product-${Math.random()}`}
+                      value={Number(product?.productID)}
+                    >
+                      <Checkbox
+                        checked={editPackageData.productIds.includes(
+                          Number(product?.productID)
+                        )}
+                      />
+                      {product?.name || `Unknown (${product?.productID})`}
+                    </MenuItem>
+                  ))
+                ) : (
+                  <MenuItem disabled>No products available</MenuItem>
+                )}
               </Select>
             </FormControl>
             <FormControl fullWidth margin="normal" required>
               <InputLabel>Package Type</InputLabel>
               <Select
-                value={editPackageData.package_typeID}
+                value={editPackageData.package_typeId || ""}
                 label="Package Type"
-                name="package_typeID"
-                onChange={handleEditInputChange}
+                name="package_typeId"
+                onChange={(e) => {
+                  setEditPackageData((prevData) => ({
+                    ...prevData,
+                    package_typeId: Number(e.target.value),
+                  }));
+                }}
+                MenuProps={menuProps}
               >
-                {packageTypes.map((type) => (
-                  <MenuItem key={type.id} value={type.id}>
-                    {type.name}
-                  </MenuItem>
-                ))}
+                {packageTypes.length > 0 ? (
+                  packageTypes.map((type) => (
+                    <MenuItem
+                      key={type.package_typeId}
+                      value={type.package_typeId}
+                    >
+                      {type.package_type_name}
+                    </MenuItem>
+                  ))
+                ) : (
+                  <MenuItem disabled>No package types available</MenuItem>
+                )}
               </Select>
             </FormControl>
             <FormControlLabel
@@ -991,7 +1042,7 @@ const PackageList = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseEditPopup}>Cancel</Button>
-          <LoadingButton
+          <Button
             variant="contained"
             loading={saving}
             onClick={handleUpdatePackage}
@@ -1003,11 +1054,11 @@ const PackageList = () => {
               Number(editPackageData.packageprice) <= 0 ||
               editPackageData.schoolIds.length === 0 ||
               editPackageData.productIds.length === 0 ||
-              !editPackageData.package_typeID
+              !editPackageData.package_typeId
             }
           >
             Update Package
-          </LoadingButton>
+          </Button>
         </DialogActions>
       </Dialog>
     </>

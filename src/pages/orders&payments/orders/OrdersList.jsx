@@ -14,7 +14,7 @@ import { useSnackbar } from "notistack";
 const OrderList = () => {
   // const [userList, setUserList]= useState([]);
   const [loading, setLoading] = useState(false);
-  const [rows, setRows] = useState([]);
+  // const [rows, setRows] = useState([]);
   const { enqueueSnackbar } = useSnackbar();
   const [selectedRows, setSelectedRows] = useState([]);
 
@@ -96,77 +96,64 @@ const OrderList = () => {
   //datagrid data
   const columns = [
     {
-      field: "categoryImage",
-      headerName: "Logo",
+      field: "type",
+      headerName: "Type",
       flex: 0.5,
-      renderCell: (params) => {
-        // console.log("params => ", params);
-        return (
-          params.formattedValue && (
-            <img
-              style={{
-                width: "45px",
-                height: "45px",
-                borderRadius: "50%",
-                objectFit: "cover",
-                cursor: "pointer",
-              }}
-              src={params.row?.categoryImage}
-              alt="logo"
-            />
-          )
-        );
-      },
+     
     },
     {
-      field: "categoryName",
-      headerName: "Category Name",
+      field: "school",
+      headerName: "School",
       flex: 1,
     },
     {
-      field: "description",
-      headerName: "Description",
+      field: "name",
+      headerName: "Name",
       flex: 1.5,
     },
     {
-      field: "isDeleted",
-      headerName: "isDeleted",
+      field: "amount",
+      headerName: "Amount",
       flex: 0.5,
     },
 
     {
-      field: "visible",
-      headerName: "visible",
+      field: "card",
+      headerName: "Card",
+      flex: 0.5,
+    },
+    {
+      field: "authcode",
+      headerName: "Auth Code",
+      flex: 0.5,
+    },
+    {
+      field: "status",
+      headerName: "Status",
+      flex: 0.5,
+    },
+    {
+      field: "date",
+      headerName: "Date",
       flex: 0.5,
     },
     // {
-    //   field: "isPackage",
-    //   headerName: "isPackage",
-    //   flex: 0.5,
+    //   field: "actions",
+    //   headerName: "Actions",
+    //   flex: 0.7,
+    //   renderCell: (params) => {
+    //     return (
+    //       <>
+    //         <Button onClick={() => editStudent(params.row)}>Edit</Button>
+    //         <Button onClick={() => deleteStudent(params.row)}>Delete</Button>
+    //         <Button>Hide</Button>
+    //       </>
+    //     );
+    //   },
     // },
-    // {
-    //   field: "isSchoolSelected",
-    //   headerName: "isSchoolSelected",
-    //   flex: 0.5,
-    // },
-
-    {
-      field: "actions",
-      headerName: "Actions",
-      flex: 0.7,
-      renderCell: (params) => {
-        return (
-          <>
-            <Button onClick={() => editStudent(params.row)}>Edit</Button>
-            <Button onClick={() => deleteStudent(params.row)}>Delete</Button>
-            <Button>Hide</Button>
-          </>
-        );
-      },
-    },
   ];
 
-  console.log("rows => ", rows);
+  // console.log("rows => ", rows);
 
   useEffect(() => {
     // httpClient
@@ -180,7 +167,6 @@ const OrderList = () => {
     //           id: category.categoryID,
     //           // col1:
     //           //   paginationModel.page * paginationModel.pageSize + (index + 1),
-
     //           categoryImage: category.categoryImage || "N/A",
     //           categoryName: category.categoryName || "N/A",
     //           description: category.description || "false",
@@ -198,35 +184,35 @@ const OrderList = () => {
     //   })
     //   .finally(() => {
     //     setLoading(false);
-      // });
+    // });
   }, []);
 
-  // const rows = [
-  //   {
-  //     id: 1,
-  //     first_name: "John",
-  //     last_name: "Doe",
-  //     school: "jdmosely",
-  //     orders: "0",
-  //     class: "1",
-  //   },
-  //   {
-  //     id: 2,
-  //     first_name: "John",
-  //     last_name: "Doe",
-  //     school: "jdmosely",
-  //     orders: "0",
-  //     class: "1",
-  //   },
-  //   {
-  //     id: 3,
-  //     first_name: "John",
-  //     last_name: "Doe",
-  //     school: "jdmosely",
-  //     orders: "0",
-  //     class: "1",
-  //   },
-  // ];
+  const rows = [
+    {
+      id: 1,
+      first_name: "John",
+      last_name: "Doe",
+      school: "jdmosely",
+      orders: "0",
+      class: "1",
+    },
+    {
+      id: 2,
+      first_name: "John",
+      last_name: "Doe",
+      school: "jdmosely",
+      orders: "0",
+      class: "1",
+    },
+    {
+      id: 3,
+      first_name: "John",
+      last_name: "Doe",
+      school: "jdmosely",
+      orders: "0",
+      class: "1",
+    },
+  ];
 
   return (
     <>
@@ -250,7 +236,7 @@ const OrderList = () => {
             </Button> */}
           </Box>
         </Box>
-        {/* <DataGrid
+         <DataGrid
           // autoHeight
           checkboxSelection
           rows={rows}
@@ -283,7 +269,7 @@ const OrderList = () => {
               outline: "none !important",
             },
           }}
-        /> */}
+        /> 
       </Box>
     </>
   );

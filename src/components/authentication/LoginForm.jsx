@@ -18,7 +18,7 @@ const LoginForm = ({ registerPath, resetPath }) => {
     httpClient
       .post("auth/login", formData) // ⬅️ Make sure to send `formData`
       .then((res) => {
-        console.log(res);
+        console.log("login api res => ", res);
         localStorage.setItem("token", JSON.stringify(res.data.data.token));
         // Store user data along with token
         localStorage.setItem(
@@ -28,11 +28,9 @@ const LoginForm = ({ registerPath, resetPath }) => {
           )
         );
         enqueueSnackbar("Login success", { variant: "success" });
-        if (res.data.data.user?.role === "Technical Admin") {
-          window.location.href = "/all";
-        }
-
-        window.location.href = "/";
+        if (res.data.data.userData?.role === "Technical Admin") {
+          window.location.href = "/";
+        } else window.location.href = "/dashboard";
       })
       .catch((err) => {
         console.log(err);

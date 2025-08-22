@@ -1,8 +1,8 @@
 import axios from "axios";
 
 const httpClient = axios.create({
-  baseURL: "http://44.195.125.80:9760/api/v1/office", // company server
-  // baseURL: "https://nrl4s91s-9729.inc1.devtunnels.ms/api/v1/office", // local server
+  // baseURL: "http://44.195.125.80:9760/api/v1/office", // company server
+  baseURL: "https://nrl4s91s-9760.inc1.devtunnels.ms/api/v1/office", // local server
   // baseURL: "http://localhost:9760/api/v1/office", // local server
 });
 
@@ -24,7 +24,7 @@ httpClient.interceptors.request.use(
     // console.log("request interceptors", token);
 
     return request;
-  },
+  },  
   (error) => {
     return Promise.reject(error);
   }

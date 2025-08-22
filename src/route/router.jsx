@@ -1,5 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import RootLayout from "../layout/root";
+import SuperAdminLayout from "../layout/super-admin";
 import LayoutApplications from "../layout/layoutApplications";
 import LoginCover from "../pages/login-cover";
 
@@ -37,6 +38,10 @@ import SiteMap from "../pages/contents/SiteMap";
 import HomeWelcome from "../pages/contents/home_welcome/HomeWelcome";
 //home multiple section
 import HomeMultipleSection from "../pages/contents/home_multiple_section/HomeMultipleSection";
+import Carousel from "../pages/contents/home_multiple_section/Carousel";
+import EditCarousel from "../pages/contents/home_multiple_section/EditCarousel";
+import ChampionRing from "../pages/contents/home_multiple_section/ChampionRing";
+import OurPackage from "../pages/contents/home_multiple_section/OurPackage";
 //facebook
 import Facebook from "../pages/contents/facebook/FaceBook";
 //twitter
@@ -47,10 +52,11 @@ import ClassRingCatalog from "../pages/contents/catalog/ClassRingCatalog";
 //custom photography
 import CustomPhotographyPage from "../pages/contents/custom_photography/CustomPhotography";
 //contact us
-import PictureOfOfficeBuilding from "../pages/contents/contact_us/PictureOfOfficeBuilding";
-import PictureOfStaff1 from "../pages/contents/contact_us/PictureOfStaff1";
-import PictureOfStaff2 from "../pages/contents/contact_us/PictureOfStaff2";
-import PictureOfStaff3 from "../pages/contents/contact_us/PictureOfStaff3";
+import ContactUs from "../pages/contents/contact_us/ContactUs";
+// import PictureOfOfficeBuilding from "../pages/contents/contact_us/PictureOfOfficeBuilding";
+// import PictureOfStaff1 from "../pages/contents/contact_us/PictureOfStaff1";
+// import PictureOfStaff2 from "../pages/contents/contact_us/PictureOfStaff2";
+// import PictureOfStaff3 from "../pages/contents/contact_us/PictureOfStaff3";
 //online orders
 import TermsAndConditions from "../pages/contents/online_orders/TermsAndConditions";
 import ShippingMessage from "../pages/contents/online_orders/ShippingMessage";
@@ -96,15 +102,31 @@ import CustomPhotography from "../pages/contents/custom_photography/CustomPhotog
 //Dashboard
 import Dashboard from "../pages/dashboard/Dashboard";
 
-//get user from local storage and find role
+//super admin home
+import SuperAdminHome from "../pages/super-admin/Home";
 
 const routes = [
+  //routers for super-admin to manage domains and sitemap data
+  {
+    path: "/",
+    element: <SuperAdminLayout />,
+    children: [
+      {
+        path: "/",
+        element: (
+          <ProtectedRoute>
+            <SuperAdminHome />
+          </ProtectedRoute>
+        ),
+      },
+    ],
+  },
   {
     path: "/",
     element: <RootLayout />,
     children: [
       {
-        path: "/",
+        path: "/dashboard",
         element: (
           <ProtectedRoute>
             <Dashboard />
@@ -256,14 +278,47 @@ const routes = [
           </ProtectedRoute>
         ),
       },
+      // {
+      //   path: "/contents/home-multiple-section",
+      //   element: (
+      //     <ProtectedRoute requiredPermission="can_access_site_map">
+      //       <HomeMultipleSection />
+      //     </ProtectedRoute>
+      //   ),
+      // },
       {
-        path: "/contents/home-multiple-section",
+        path: "/contents/carousel",
         element: (
           <ProtectedRoute requiredPermission="can_access_site_map">
-            <HomeMultipleSection />
+            <Carousel />
           </ProtectedRoute>
         ),
       },
+      {
+        path: "/contents/carousel/edit-carousel/:id",
+        element: (
+          <ProtectedRoute requiredPermission="can_access_site_map">
+            <EditCarousel />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/contents/champion-ring",
+        element: (
+          <ProtectedRoute requiredPermission="can_access_site_map">
+            <ChampionRing />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/contents/our-packages",
+        element: (
+          <ProtectedRoute requiredPermission="can_access_site_map">
+            <OurPackage />
+          </ProtectedRoute>
+        ),
+      },
+
       {
         path: "/contents/facebook",
         element: (
@@ -299,48 +354,56 @@ const routes = [
       },
 
       //custom photography
-      {
-        path: "/contents/custom-photography",
-        element: (
-          <ProtectedRoute requiredPermission="can_access_site_map">
-            <CustomPhotography />
-          </ProtectedRoute>
-        ),
-      },
+      // {
+      //   path: "/contents/custom-photography",
+      //   element: (
+      //     <ProtectedRoute requiredPermission="can_access_site_map">
+      //       <CustomPhotography />
+      //     </ProtectedRoute>
+      //   ),
+      // },
 
       //contact us
       {
-        path: "/contents/picture-of-office-building",
+        path: "/contents/contact-us",
         element: (
           <ProtectedRoute requiredPermission="can_access_site_map">
-            <PictureOfOfficeBuilding />
+            <ContactUs />
           </ProtectedRoute>
         ),
       },
-      {
-        path: "/contents/picture-of-staff-1",
-        element: (
-          <ProtectedRoute requiredPermission="can_access_site_map">
-            <PictureOfStaff1 />
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: "/contents/picture-of-staff-2",
-        element: (
-          <ProtectedRoute requiredPermission="can_access_site_map">
-            <PictureOfStaff2 />
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: "/contents/picture-of-staff-3",
-        element: (
-          <ProtectedRoute requiredPermission="can_access_site_map">
-            <PictureOfStaff3 />
-          </ProtectedRoute>
-        ),
-      },
+      // {
+      //   path: "/contents/picture-of-office-building",
+      //   element: (
+      //     <ProtectedRoute requiredPermission="can_access_site_map">
+      //       <PictureOfOfficeBuilding />
+      //     </ProtectedRoute>
+      //   ),
+      // },
+      // {
+      //   path: "/contents/picture-of-staff-1",
+      //   element: (
+      //     <ProtectedRoute requiredPermission="can_access_site_map">
+      //       <PictureOfStaff1 />
+      //     </ProtectedRoute>
+      //   ),
+      // },
+      // {
+      //   path: "/contents/picture-of-staff-2",
+      //   element: (
+      //     <ProtectedRoute requiredPermission="can_access_site_map">
+      //       <PictureOfStaff2 />
+      //     </ProtectedRoute>
+      //   ),
+      // },
+      // {
+      //   path: "/contents/picture-of-staff-3",
+      //   element: (
+      //     <ProtectedRoute requiredPermission="can_access_site_map">
+      //       <PictureOfStaff3 />
+      //     </ProtectedRoute>
+      //   ),
+      // },
 
       //online orders
       {
@@ -619,32 +682,5 @@ const routes = [
     ],
   },
 ];
-
-// if (role === "Technical Admin") {
-//   routes.push({
-//     path: "/all",
-//     element: (
-//       <ProtectedRoute>
-//         <Dashboard />,
-//       </ProtectedRoute>
-//     ),
-//   });
-// }
-// else {
-//   routes.push({
-//     path: "/",
-//     element: <RootLayout />,
-//     children: [
-//       {
-//         path: "/",
-//         element: (
-//           <ProtectedRoute>
-//             <Home />
-//           </ProtectedRoute>
-//         ),
-//       },
-//     ],
-//   });
-// }
 
 export const router = createBrowserRouter(routes);

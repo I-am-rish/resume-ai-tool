@@ -12,7 +12,7 @@ const OtherDashboard = () => {
     httpClient
       .get(`/dashboard/get-dashboard-contents`)
       .then((res) => {
-        console.log("dashboard => ", res);
+        // console.log("dashboard => ", res);
         setData(res.data.data);
       })
       .catch((err) => {

@@ -9,16 +9,29 @@ import {
 } from "@mui/material";
 
 const sitemapData = [
-  {
-    title: "Homepage Welcome",
-    nav: "home-welcome",
-  },
+  // {
+  //   title: "Homepage Welcome",
+  //   nav: "home-welcome",
+  // },
   {
     title: "Home Multiple Section",
-    nav: "home-multiple-section",
+    // nav: "home-multiple-section",
+    links: [
+      {
+        title: "Carousel",
+        nav: "carousel",
+      },
+      {
+        title: "Champion Ring",
+        nav: "champion-ring",
+      },
+      {
+        title: "Our Packages",
+        nav: "our-packages",
+      },
+    ],
   },
-  { title: "Facebook", nav: "facebook" },
-  { title: "Twitter", nav: "twitter" },
+
   {
     title: "Catalog",
     links: [
@@ -32,27 +45,27 @@ const sitemapData = [
       },
     ],
   },
-  { title: "Custom Photography Page", nav: "custom-photography" },
   {
     title: "Contact Us",
-    links: [
-      {
-        title: "Picture of Office Building",
-        nav: "picture-of-office-building",
-      },
-      {
-        title: "Picture of Staff # 1",
-        nav: "picture-of-staff-1",
-      },
-      {
-        title: "Picture of Staff # 2",
-        nav: "picture-of-staff-2",
-      },
-      {
-        title: "Picture of Staff # 3",
-        nav: "picture-of-staff-3",
-      },
-    ],
+    nav: "contact-us",
+    // links: [
+    //   {
+    //     title: "Picture of Office Building",
+    //     nav: "picture-of-office-building",
+    //   },
+    //   {
+    //     title: "Picture of Staff # 1",
+    //     nav: "picture-of-staff-1",
+    //   },
+    //   {
+    //     title: "Picture of Staff # 2",
+    //     nav: "picture-of-staff-2",
+    //   },
+    //   {
+    //     title: "Picture of Staff # 3",
+    //     nav: "picture-of-staff-3",
+    //   },
+    // ],
   },
   {
     title: "Online Orders",
@@ -129,6 +142,11 @@ const sitemapData = [
   {
     title: "Basic Content Sections",
     links: [
+      { title: "Facebook", nav: "facebook" },
+      { title: "Twitter", nav: "twitter" },
+      { title: "Instagram", nav: "instagram" },
+      { title: "LinkedIn", nav: "linkedin" },
+      { title: "WhatsApp", nav: "whatsapp" },
       {
         title: "Recognition",
         nav: "recognition",
@@ -149,10 +167,10 @@ const sitemapData = [
         title: "Legal",
         nav: "legal",
       },
-      {
-        title: "Notes",
-        nav: "notes",
-      },
+      // {
+      //   title: "Notes",
+      //   nav: "notes",
+      // },
     ],
   },
 ];
