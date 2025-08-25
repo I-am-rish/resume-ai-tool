@@ -29,6 +29,7 @@
     "emoji-picker-react": "^4.12.0",
     "feather-icons": "^4.29.2",
     "feather-icons-react": "^0.7.0",
+    "framer-motion": "^12.23.12",
     "html-react-parser": "^5.2.6",
     "notistack": "^3.0.2",
     "perfect-scrollbar": "^1.5.5",

@@ -1,11 +1,11 @@
 import { Outlet } from "react-router-dom";
-import Header from "@/components/shared/header/SuperAdminHeader";
+import Header from "@/components/shared/header/LandingHeader";
 
-const SuperAdmin = () => {
+const Landing = () => {
   return (
     <>
       <Header />
-      <main >
+      <main>
         <div className="nxl-content">
           <Outlet />
         </div>
@@ -14,4 +14,4 @@ const SuperAdmin = () => {
   );
 };
 
-export default SuperAdmin;
+export default Landing;

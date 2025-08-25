@@ -13,9 +13,9 @@ const ProtectedRoute = ({ children, requiredPermission }) => {
     return <Navigate to="/authentication/login" replace />;
   }
 
-  if (requiredPermission && !hasPermission(requiredPermission)) {
-    return <Navigate to="/unauthorized" replace />;
-  }
+  // if (requiredPermission && !hasPermission(requiredPermission)) {
+  //   return <Navigate to="/unauthorized" replace />;
+  // }
 
   return children;
 };

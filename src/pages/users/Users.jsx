@@ -1,4 +1,3 @@
-import httpClient from "@/utils/httpClinet";
 import {
   Box,
   Button,
@@ -13,8 +12,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { useSnackbar } from "notistack";
-import EditUser from "./EditUser";
-import axios from "axios";
+import httpClient from "../../utils/httpClinet";
 
 //DataGrid
 // import DataGrid from "../../components/datagrid/DataGrid";
