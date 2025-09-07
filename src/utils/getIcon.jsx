@@ -114,6 +114,7 @@ import {
   FiUsers,
   FiX,
   FiYoutube,
+  FiVideo,
 } from "react-icons/fi";
 import { PiStudent } from "react-icons/pi";
 import { FaSchool } from "react-icons/fa6";
@@ -125,9 +126,13 @@ import {
 } from "react-icons/md";
 import { MdProductionQuantityLimits } from "react-icons/md";
 import { GoPackage } from "react-icons/go";
+import { LuLayoutDashboard } from "react-icons/lu";
+
 
 const getIcon = (name) => {
   switch (name) {
+    case "feather-dashboard":
+      return <LuLayoutDashboard />;
     case "feather-students":
       return <PiStudent />;
     case "feather-school":
@@ -310,6 +315,8 @@ const getIcon = (name) => {
       return <FiSliders />;
     case "feather-framer":
       return <FiFramer />;
+    case "feather-video":
+      return <FiVideo />;
 
     case "fa-chrome":
       return <FaChrome />;

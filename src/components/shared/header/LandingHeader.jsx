@@ -11,15 +11,17 @@ import {
   ListItemText,
   Box,
   Avatar,
+  Divider,
+  useTheme,
+  alpha,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-
-// Apply custom font by importing Google Fonts
-// In your index.html or _document.js, add:
-// <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+import CloseIcon from "@mui/icons-material/Close";
+import { motion } from "framer-motion";
 
 const Navbar = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const theme = useTheme();
 
   const toggleDrawer = (open) => () => {
     setDrawerOpen(open);
@@ -31,76 +33,123 @@ const Navbar = () => {
         position="sticky"
         elevation={0}
         sx={{
-          background:
-            "linear-gradient(90deg, #eef0f5 0%, #e9ebf0 50%, #f6f8fc 100%)",
-          color: "white",
+          background: "rgba(255, 255, 255, 0.9)",
+          backdropFilter: "blur(10px)",
+          borderBottom: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+          color: theme.palette.text.primary,
           top: 0,
           zIndex: 1100,
           fontFamily: "'Poppins', sans-serif",
-          padding: "0px 100px"
+          px: { xs: 2, sm: 4, md: 6, lg: 8 },
+          boxShadow: "0 4px 20px rgba(0, 0, 0, 0.05)",
+          transition: "all 0.3s ease",
         }}
       >
-        <Toolbar sx={{ justifyContent: "space-between" }}>
+        <Toolbar sx={{ justifyContent: "space-between", py: 1 }}>
           {/* Left: Logo + Title */}
           <Box display="flex" alignItems="center">
-            {/* Dummy Logo using MUI Avatar */}
-            <Avatar
-              src="https://dummyimage.com/40x40/6366f1/ffffff&text=AI"
-              alt="AI Power Logo"
-              sx={{ mr: 1, bgcolor: "primary.main", fontSize: 14 }}
-            />
+            <motion.div
+              whileHover={{ rotate: 10 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
+              <Avatar
+                src="https://dummyimage.com/40x40/6366f1/ffffff&text=AI"
+                alt="AI Power Logo"
+                sx={{
+                  mr: 1.5,
+                  bgcolor: theme.palette.primary.main,
+                  width: 42,
+                  height: 42,
+                  boxShadow: "0 4px 10px rgba(99, 102, 241, 0.3)",
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    boxShadow: "0 6px 15px rgba(99, 102, 241, 0.5)",
+                    transform: "scale(1.05)",
+                  },
+                }}
+              />
+            </motion.div>
             <Typography
-              variant="h6"
-              sx={{ fontWeight: 700, fontFamily: "'Poppins', sans-serif" }}
+              variant="h5"
+              sx={{
+                fontWeight: 700,
+                fontFamily: "'Poppins', sans-serif",
+                background: "linear-gradient(90deg, #4F46E5, #8B5CF6)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                letterSpacing: "-0.5px",
+              }}
             >
               CareerAI
             </Typography>
           </Box>
 
           {/* Desktop Menu */}
-          <Box sx={{ display: { xs: "none", md: "flex" }, gap: 2 }}>
+          <Box
+            sx={{
+              display: { xs: "none", md: "flex" },
+              gap: 2,
+              alignItems: "center",
+            }}
+          >
             <Button
               sx={{
-                color: "#000000",
+                color: theme.palette.text.primary,
                 textTransform: "none",
                 fontFamily: "'Poppins', sans-serif",
-                border: "2px solid transparent",
-                borderRadius: "8px",
-                transition: "all 0.3s ease-in-out",
+                fontWeight: 500,
+                fontSize: "0.95rem",
+                border: `2px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+                borderRadius: "12px",
+                px: 3,
+                py: 1,
+                transition: "all 0.3s ease",
                 "&:hover": {
-                  background:
-                    "linear-gradient(90deg, #5d7de4 0%, #a04ee4 100%)",
-                  color: "white",
-                  transform: "scale(1.05)",
-                  boxShadow: "0 4px 15px rgba(34,197,94,0.5)",
+                  borderColor: theme.palette.primary.main,
+                  backgroundColor: alpha(theme.palette.primary.main, 0.05),
+                  transform: "translateY(-2px)",
+                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
                 },
               }}
             >
               Sign In
             </Button>
-            <Button
-              variant="contained"
-              sx={{
-                background: "linear-gradient(90deg, #3b82f6 0%, #9333ea 100%)",
-                textTransform: "none",
-                borderRadius: "8px",
-                fontFamily: "'Poppins', sans-serif",
-                transition: "all 0.3s ease-in-out",
-                "&:hover": {
-                  transform: "scale(1.05)",
-                  boxShadow: "0 4px 15px rgba(147,51,234,0.5)",
-                },
-              }}
-            >
-              Get Started
-            </Button>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button
+                variant="contained"
+                sx={{
+                  background: "linear-gradient(90deg, #4F46E5, #8B5CF6)",
+                  textTransform: "none",
+                  borderRadius: "12px",
+                  fontFamily: "'Poppins', sans-serif",
+                  fontWeight: 600,
+                  fontSize: "0.95rem",
+                  px: 3.5,
+                  py: 1,
+                  boxShadow: "0 4px 15px rgba(79, 70, 229, 0.3)",
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    boxShadow: "0 6px 20px rgba(79, 70, 229, 0.4)",
+                    transform: "translateY(-2px)",
+                  },
+                }}
+              >
+                Get Started
+              </Button>
+            </motion.div>
           </Box>
 
           {/* Mobile Menu Icon */}
           <IconButton
             edge="end"
             color="inherit"
-            sx={{ display: { xs: "flex", md: "none" } }}
+            sx={{
+              display: { xs: "flex", md: "none" },
+              color: theme.palette.text.primary,
+              "&:hover": {
+                backgroundColor: alpha(theme.palette.primary.main, 0.1),
+              },
+            }}
             onClick={toggleDrawer(true)}
           >
             <MenuIcon />
@@ -109,37 +158,94 @@ const Navbar = () => {
       </AppBar>
 
       {/* Drawer for Mobile */}
-      <Drawer anchor="right" open={drawerOpen} onClose={toggleDrawer(false)}>
+      <Drawer
+        anchor="right"
+        open={drawerOpen}
+        onClose={toggleDrawer(false)}
+        PaperProps={{
+          sx: {
+            width: 280,
+            fontFamily: "'Poppins', sans-serif",
+            background: "linear-gradient(180deg, #0F172A 0%, #1E293B 100%)",
+            color: "white",
+            borderTopLeftRadius: 20,
+            borderBottomLeftRadius: 20,
+            boxShadow: "-5px 0 15px rgba(0, 0, 0, 0.1)",
+          },
+        }}
+      >
         <Box
           sx={{
-            width: 250,
-            fontFamily: "'Poppins', sans-serif",
-            background: "linear-gradient(180deg, #0f172a 0%, #1e293b 100%)",
-            height: "100%",
-            color: "white",
+            p: 2,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
           }}
-          role="presentation"
-          onClick={toggleDrawer(false)}
-          onKeyDown={toggleDrawer(false)}
         >
+          <Box display="flex" alignItems="center">
+            <Avatar
+              src="https://dummyimage.com/40x40/6366f1/ffffff&text=AI"
+              alt="AI Power Logo"
+              sx={{ mr: 1.5, bgcolor: theme.palette.primary.main }}
+            />
+            <Typography
+              variant="h6"
+              sx={{
+                fontWeight: 700,
+                fontFamily: "'Poppins', sans-serif",
+                background: "linear-gradient(90deg, #4F46E5, #8B5CF6)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              CareerAI
+            </Typography>
+          </Box>
+          <IconButton onClick={toggleDrawer(false)} sx={{ color: "white" }}>
+            <CloseIcon />
+          </IconButton>
+        </Box>
+
+        <Divider sx={{ my: 1, borderColor: "rgba(255, 255, 255, 0.1)" }} />
+
+        <Box sx={{ p: 2 }}>
           <List>
-            <ListItem button>
-              <ListItemText primary="Sign In" />
+            <ListItem
+              button
+              sx={{
+                borderRadius: 2,
+                mb: 1,
+                transition: "all 0.3s ease",
+                "&:hover": {
+                  backgroundColor: alpha(theme.palette.primary.main, 0.15),
+                },
+              }}
+            >
+              <ListItemText
+                primary="Sign In"
+                primaryTypographyProps={{
+                  fontFamily: "'Poppins', sans-serif",
+                  fontWeight: 500,
+                }}
+              />
             </ListItem>
-            <ListItem>
+
+            <ListItem sx={{ py: 1 }}>
               <Button
                 fullWidth
                 variant="contained"
                 sx={{
-                  background:
-                    "linear-gradient(90deg, #3b82f6 0%, #9333ea 100%)",
+                  background: "linear-gradient(90deg, #4F46E5, #8B5CF6)",
                   textTransform: "none",
-                  borderRadius: "8px",
+                  borderRadius: "12px",
                   fontFamily: "'Poppins', sans-serif",
-                  transition: "all 0.3s ease-in-out",
+                  fontWeight: 600,
+                  py: 1.2,
+                  boxShadow: "0 4px 15px rgba(79, 70, 229, 0.3)",
+                  transition: "all 0.3s ease",
                   "&:hover": {
-                    transform: "scale(1.05)",
-                    boxShadow: "0 4px 15px rgba(147,51,234,0.5)",
+                    boxShadow: "0 6px 20px rgba(79, 70, 229, 0.4)",
+                    transform: "translateY(-2px)",
                   },
                 }}
               >
@@ -154,3 +260,268 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
+// import React, { useState } from "react";
+// import {
+//   AppBar,
+//   Toolbar,
+//   Typography,
+//   Button,
+//   IconButton,
+//   Drawer,
+//   List,
+//   ListItem,
+//   ListItemText,
+//   Box,
+//   Avatar,
+//   Divider,
+//   useTheme,
+//   alpha,
+// } from "@mui/material";
+// import MenuIcon from "@mui/icons-material/Menu";
+// import CloseIcon from "@mui/icons-material/Close";
+// import { motion } from "framer-motion";
+
+// const Navbar = () => {
+//   const [drawerOpen, setDrawerOpen] = useState(false);
+//   const theme = useTheme();
+
+//   const toggleDrawer = (open) => () => {
+//     setDrawerOpen(open);
+//   };
+
+//   return (
+//     <>
+//       <AppBar
+//         position="sticky"
+//         elevation={0}
+//         sx={{
+//           background: "rgba(15, 23, 42, 0.8)",
+//           backdropFilter: "blur(10px)",
+//           borderBottom: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+//           color: "#FFFFFF",
+//           top: 0,
+//           zIndex: 1100,
+//           fontFamily: "'Poppins', sans-serif",
+//           px: { xs: 2, sm: 4, md: 6, lg: 8 },
+//           boxShadow: "0 4px 20px rgba(0, 0, 0, 0.3)",
+//           transition: "all 0.3s ease",
+//         }}
+//       >
+//         <Toolbar sx={{ justifyContent: "space-between", py: 1 }}>
+//           {/* Left: Logo + Title */}
+//           <Box display="flex" alignItems="center">
+//             <motion.div
+//               whileHover={{ rotate: 10 }}
+//               transition={{ type: "spring", stiffness: 300 }}
+//             >
+//               <Avatar
+//                 src="https://dummyimage.com/40x40/6366f1/ffffff&text=AI"
+//                 alt="AI Power Logo"
+//                 sx={{
+//                   mr: 1.5,
+//                   bgcolor: theme.palette.primary.main,
+//                   width: 42,
+//                   height: 42,
+//                   boxShadow: "0 4px 10px rgba(99, 102, 241, 0.5)",
+//                   transition: "all 0.3s ease",
+//                   "&:hover": {
+//                     boxShadow: "0 6px 15px rgba(99, 102, 241, 0.7)",
+//                     transform: "scale(1.05)",
+//                   },
+//                 }}
+//               />
+//             </motion.div>
+//             <Typography
+//               variant="h5"
+//               sx={{
+//                 fontWeight: 700,
+//                 fontFamily: "'Poppins', sans-serif",
+//                 background: "linear-gradient(90deg, #FFFFFF, #E2E8F0)",
+//                 WebkitBackgroundClip: "text",
+//                 WebkitTextFillColor: "transparent",
+//                 letterSpacing: "-0.5px",
+//                 textShadow: "0 0 30px rgba(79, 70, 229, 0.5)",
+//               }}
+//             >
+//               CareerAI
+//             </Typography>
+//           </Box>
+
+//           {/* Desktop Menu */}
+//           <Box
+//             sx={{
+//               display: { xs: "none", md: "flex" },
+//               gap: 2,
+//               alignItems: "center",
+//             }}
+//           >
+//             <Button
+//               sx={{
+//                 color: "#E2E8F0",
+//                 textTransform: "none",
+//                 fontFamily: "'Poppins', sans-serif",
+//                 fontWeight: 500,
+//                 fontSize: "0.95rem",
+//                 border: `2px solid ${alpha(theme.palette.primary.main, 0.3)}`,
+//                 borderRadius: "12px",
+//                 px: 3,
+//                 py: 1,
+//                 transition: "all 0.3s ease",
+//                 "&:hover": {
+//                   borderColor: theme.palette.primary.main,
+//                   backgroundColor: alpha(theme.palette.primary.main, 0.1),
+//                   transform: "translateY(-2px)",
+//                   boxShadow: "0 4px 12px rgba(79, 70, 229, 0.3)",
+//                 },
+//               }}
+//             >
+//               Sign In
+//             </Button>
+//             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+//               <Button
+//                 variant="contained"
+//                 sx={{
+//                   background: "linear-gradient(90deg, #4F46E5, #8B5CF6)",
+//                   textTransform: "none",
+//                   borderRadius: "12px",
+//                   fontFamily: "'Poppins', sans-serif",
+//                   fontWeight: 600,
+//                   fontSize: "0.95rem",
+//                   px: 3.5,
+//                   py: 1,
+//                   boxShadow: "0 4px 15px rgba(79, 70, 229, 0.5)",
+//                   transition: "all 0.3s ease",
+//                   "&:hover": {
+//                     boxShadow: "0 6px 20px rgba(79, 70, 229, 0.7)",
+//                     transform: "translateY(-2px)",
+//                   },
+//                 }}
+//               >
+//                 Get Started
+//               </Button>
+//             </motion.div>
+//           </Box>
+
+//           {/* Mobile Menu Icon */}
+//           <IconButton
+//             edge="end"
+//             color="inherit"
+//             sx={{
+//               display: { xs: "flex", md: "none" },
+//               color: "#E2E8F0",
+//               "&:hover": {
+//                 backgroundColor: alpha(theme.palette.primary.main, 0.2),
+//               },
+//             }}
+//             onClick={toggleDrawer(true)}
+//           >
+//             <MenuIcon />
+//           </IconButton>
+//         </Toolbar>
+//       </AppBar>
+
+//       {/* Drawer for Mobile */}
+//       <Drawer
+//         anchor="right"
+//         open={drawerOpen}
+//         onClose={toggleDrawer(false)}
+//         PaperProps={{
+//           sx: {
+//             width: 280,
+//             fontFamily: "'Poppins', sans-serif",
+//             background: "linear-gradient(180deg, #0F172A 0%, #1E293B 100%)",
+//             color: "white",
+//             borderTopLeftRadius: 20,
+//             borderBottomLeftRadius: 20,
+//             boxShadow: "-5px 0 15px rgba(0, 0, 0, 0.3)",
+//           },
+//         }}
+//       >
+//         <Box
+//           sx={{
+//             p: 2,
+//             display: "flex",
+//             justifyContent: "space-between",
+//             alignItems: "center",
+//           }}
+//         >
+//           <Box display="flex" alignItems="center">
+//             <Avatar
+//               src="https://dummyimage.com/40x40/6366f1/ffffff&text=AI"
+//               alt="AI Power Logo"
+//               sx={{ mr: 1.5, bgcolor: theme.palette.primary.main }}
+//             />
+//             <Typography
+//               variant="h6"
+//               sx={{
+//                 fontWeight: 700,
+//                 fontFamily: "'Poppins', sans-serif",
+//                 background: "linear-gradient(90deg, #FFFFFF, #E2E8F0)",
+//                 WebkitBackgroundClip: "text",
+//                 WebkitTextFillColor: "transparent",
+//               }}
+//             >
+//               CareerAI
+//             </Typography>
+//           </Box>
+//           <IconButton onClick={toggleDrawer(false)} sx={{ color: "#E2E8F0" }}>
+//             <CloseIcon />
+//           </IconButton>
+//         </Box>
+
+//         <Divider sx={{ my: 1, borderColor: "rgba(255, 255, 255, 0.1)" }} />
+
+//         <Box sx={{ p: 2 }}>
+//           <List>
+//             <ListItem
+//               button
+//               sx={{
+//                 borderRadius: 2,
+//                 mb: 1,
+//                 transition: "all 0.3s ease",
+//                 "&:hover": {
+//                   backgroundColor: alpha(theme.palette.primary.main, 0.2),
+//                 },
+//               }}
+//             >
+//               <ListItemText
+//                 primary="Sign In"
+//                 primaryTypographyProps={{
+//                   fontFamily: "'Poppins', sans-serif",
+//                   fontWeight: 500,
+//                   color: "#E2E8F0",
+//                 }}
+//               />
+//             </ListItem>
+
+//             <ListItem sx={{ py: 1 }}>
+//               <Button
+//                 fullWidth
+//                 variant="contained"
+//                 sx={{
+//                   background: "linear-gradient(90deg, #4F46E5, #8B5CF6)",
+//                   textTransform: "none",
+//                   borderRadius: "12px",
+//                   fontFamily: "'Poppins', sans-serif",
+//                   fontWeight: 600,
+//                   py: 1.2,
+//                   boxShadow: "0 4px 15px rgba(79, 70, 229, 0.5)",
+//                   transition: "all 0.3s ease",
+//                   "&:hover": {
+//                     boxShadow: "0 6px 20px rgba(79, 70, 229, 0.7)",
+//                     transform: "translateY(-2px)",
+//                   },
+//                 }}
+//               >
+//                 Get Started
+//               </Button>
+//             </ListItem>
+//           </List>
+//         </Box>
+//       </Drawer>
+//     </>
+//   );
+// };
+
+// export default Navbar;

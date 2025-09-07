@@ -1,30 +1,34 @@
 import { createBrowserRouter } from "react-router-dom";
 import RootLayout from "../layout/root";
 import LandingLayout from "../layout/Landing";
-import LayoutApplications from "../layout/layoutApplications";
+// import LayoutApplications from "../layout/layoutApplications";
 import LoginCover from "../pages/login-cover";
 
-import LayoutSetting from "../layout/layoutSetting";
+// import LayoutSetting from "../layout/layoutSetting";
 
-// import Home from "../pages/home/Home";
 
-//My Account
-import MyAccount from "../pages/my-account/MyAccount";
 
 import LayoutAuth from "../layout/layoutAuth";
 import ProtectedRoute from "../components/ProtectedRoute";
 import Unauthorized from "../pages/Unauthorized";
 
-//Users
-import UserList from "../pages/users/Users";
 //Dashboard
 import Dashboard from "../pages/dashboard/Dashboard";
 
 //super admin home
-import SuperAdminHome from "../pages/super-admin/Home";
+import Landing from "../pages/landing-page/Landing";
+
+//private routes
+import Resume from "../pages/resume/Resume";
+import CoverLetter from "../pages/cover-letter/CoverLetter";
+import QAndA from "../pages/q&a/QAndA";
+import Interview from "../pages/interview/Interview";
+import Analytics from "../pages/analytics/Analytics";
+import Archive from "../pages/archive/Archive";
+
+
 
 const routes = [
-  //routers for super-admin to manage domains and sitemap data
   {
     path: "/",
     element: <LandingLayout />,
@@ -33,7 +37,7 @@ const routes = [
         path: "/",
         element: (
           <ProtectedRoute>
-            <SuperAdminHome />
+            <Landing />
           </ProtectedRoute>
         ),
       },
@@ -46,38 +50,63 @@ const routes = [
       {
         path: "/dashboard",
         element: (
-          <ProtectedRoute>
+          // <ProtectedRoute>
             <Dashboard />
-          </ProtectedRoute>
+          // </ProtectedRoute>
         ),
       },
-    ],
-  },
-  {
-    path: "/",
-    element: <RootLayout />,
-    children: [
-      //my account
       {
-        path: "/my-account",
+        path: "/resume",
         element: (
-          <ProtectedRoute>
-            <MyAccount />
-          </ProtectedRoute>
+          // <ProtectedRoute>
+            <Resume />
+          // </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/cover-letter",
+        element: (
+          // <ProtectedRoute>
+            <CoverLetter />
+          // </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/q-and-a",
+        element: (
+          // <ProtectedRoute>
+            <QAndA />
+          // </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/interview",
+        element: (
+          // <ProtectedRoute>
+            <Interview />
+          // </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/analytics",
+        element: (
+          // <ProtectedRoute>
+            <Analytics />
+          // </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/archive",
+        element: (
+          // <ProtectedRoute>
+            <Archive />
+          // </ProtectedRoute>
         ),
       },
 
-      //users
-      {
-        path: "/users/manage-users",
-        element: (
-          <ProtectedRoute requiredPermission="can_manage_users">
-            <UserList />
-          </ProtectedRoute>
-        ),
-      },
     ],
   },
+ 
 
   {
     path: "/",
