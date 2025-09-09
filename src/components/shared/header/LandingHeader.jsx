@@ -18,10 +18,12 @@ import {
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const theme = useTheme();
+  const navigate = useNavigate();
 
   const toggleDrawer = (open) => () => {
     setDrawerOpen(open);
@@ -111,6 +113,7 @@ const Navbar = () => {
                   boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
                 },
               }}
+              onClick={() => navigate("/authentication/login")}
             >
               Sign In
             </Button>
@@ -133,6 +136,7 @@ const Navbar = () => {
                     transform: "translateY(-2px)",
                   },
                 }}
+                onClick={() => navigate("/authentication/login")}
               >
                 Get Started
               </Button>
@@ -248,6 +252,7 @@ const Navbar = () => {
                     transform: "translateY(-2px)",
                   },
                 }}
+                onClick={() => navigate("/authentication/login")}
               >
                 Get Started
               </Button>

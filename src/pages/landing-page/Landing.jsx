@@ -963,6 +963,7 @@ import WorkIcon from "@mui/icons-material/Work";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import QuestionAnswerIcon from "@mui/icons-material/QuestionAnswer";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 // Enhanced features with more meaningful colors
 const features = [
@@ -1198,6 +1199,8 @@ const LightBackground = ({ children }) => {
 
 const CareerLanding = () => {
   const theme = useTheme();
+  const navigate = useNavigate();
+
 
   const buttonBaseStyles = {
     textTransform: "none",
@@ -1288,6 +1291,7 @@ const CareerLanding = () => {
                     boxShadow: "0 6px 20px rgba(79, 70, 229, 0.4)",
                   },
                 }}
+                onClick={() => navigate("/authentication/login")}
               >
                 Start Free Today
               </Button>
