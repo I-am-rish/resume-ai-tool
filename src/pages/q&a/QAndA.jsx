@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -26,18 +26,20 @@ import {
   SkipNext as SkipForwardIcon,
   Send as SendIcon,
   RestartAlt as RotateCcwIcon,
-  ArrowBack,
 } from "@mui/icons-material";
 import { keyframes } from "@emotion/react";
+import TechnicalPopup from "./TechnicalPopup";
+import BehavioralPopup from "./BehavioralPopup";
+import { useSnackbar } from "notistack";
 
 // Custom MUI Theme
 const theme = createTheme({
   palette: {
-    primary: { main: "#3b82f6" }, // Modern blue
-    secondary: { main: "#10b981" }, // Green for success and stop recording
-    error: { main: "#ef4444" }, // Red for errors (not used for recording)
-    warning: { main: "#f59e0b" }, // Amber for warnings
-    info: { main: "#14b8a6" }, // Teal for recording indicator
+    primary: { main: "#3b82f6" },
+    secondary: { main: "#10b981" },
+    error: { main: "#ef4444" },
+    warning: { main: "#f59e0b" },
+    info: { main: "#14b8a6" },
     background: { paper: "#ffffff", default: "#f8fafc" },
     text: { primary: "#1e293b", secondary: "#64748b" },
   },
@@ -156,19 +158,53 @@ const mockQuestions = [
 ];
 
 export default function QA() {
+  const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
   const [sessionState, setSessionState] = useState("setup");
-  const [questionType, setQuestionType] = useState("behavioral");
+  const [questionType, setQuestionType] = useState("");
   const [difficulty, setDifficulty] = useState("medium");
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
-  const [transcript, setTranscript] = useState("");
+  const [finalTranscript, setFinalTranscript] = useState("");
+  const [interimTranscript, setInterimTranscript] = useState("");
   const [feedback, setFeedback] = useState(null);
+  const [show, setShow] = useState(true);
+
+  // Speech recognition setup
+  const [recognition, setRecognition] = useState(null);
+
+  useEffect(() => {
+    // Initialize SpeechRecognition
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      const recog = new SpeechRecognition();
+      recog.continuous = true; // Keep listening until stopped
+      recog.interimResults = true; // Show interim results for real-time transcription
+      recog.lang = "en-US"; // Set language to English
+      setRecognition(recog);
+    } else {
+      enqueueSnackbar("Speech recognition not supported in your browser.", {
+        variant: "warning",
+      });
+    }
+  }, [enqueueSnackbar]);
+
+  // Set question type based on URL path
+  useEffect(() => {
+    setQuestionType(window.location.pathname.substring(1));
+    setShow(true);
+  }, [window.location.pathname]);
+
+  // Read question aloud when sessionState changes to "question"
+  useEffect(() => {
+    if (sessionState === "question" && currentQuestion) {
+      readQuestionAloud(currentQuestion.text);
+    }
+  }, [sessionState, currentQuestion]);
 
   const getRandomQuestion = (type, level) => {
-    const filteredQuestions = mockQuestions.filter(
-      (q) => q.type === type && q.difficulty === level
-    );
+    const filteredQuestions = mockQuestions.filter((q) => q.type === type);
     return filteredQuestions[
       Math.floor(Math.random() * filteredQuestions.length)
     ];
@@ -178,8 +214,10 @@ export default function QA() {
     const question = getRandomQuestion(questionType, difficulty);
     setCurrentQuestion(question);
     setSessionState("question");
-    setTranscript("");
+    setFinalTranscript("");
+    setInterimTranscript("");
     setFeedback(null);
+    setShow(false);
   };
 
   const skipQuestion = () => {
@@ -188,18 +226,79 @@ export default function QA() {
   };
 
   const startRecording = () => {
-    setIsRecording(true);
-    setSessionState("recording");
-    setTimeout(() => {
-      setTranscript(
-        "This is a mock transcript. In a real implementation, this would be generated from speech-to-text..."
-      );
-    }, 2000);
+    if (recognition) {
+      setIsRecording(true);
+      setSessionState("recording");
+      setFinalTranscript(""); // Clear previous final transcript
+      setInterimTranscript(""); // Clear previous interim transcript
+
+      // Set up event handlers
+      recognition.onresult = (event) => {
+        let interim = "";
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const transcriptPart = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            // Append only new final transcript to avoid duplicates
+            setFinalTranscript((prev) => prev + transcriptPart + " ");
+            setInterimTranscript(""); // Clear interim when final is received
+          } else {
+            interim = transcriptPart;
+          }
+        }
+        setInterimTranscript(interim);
+      };
+
+      recognition.onerror = (event) => {
+        enqueueSnackbar(`Speech recognition error: ${event.error}`, {
+          variant: "error",
+        });
+        setIsRecording(false);
+        setSessionState("question");
+      };
+
+      recognition.onend = () => {
+        if (isRecording) {
+          try {
+            recognition.start(); // Restart recognition if still recording
+          } catch (error) {
+            enqueueSnackbar("Failed to restart recording.", {
+              variant: "error",
+            });
+            setIsRecording(false);
+            setSessionState("question");
+          }
+        }
+      };
+
+      try {
+        recognition.start();
+      } catch (error) {
+        enqueueSnackbar(
+          "Failed to start recording. Please check microphone permissions.",
+          {
+            variant: "error",
+          }
+        );
+        setIsRecording(false);
+        setSessionState("question");
+      }
+    } else {
+      enqueueSnackbar("Speech recognition not available.", {
+        variant: "warning",
+      });
+    }
   };
 
   const stopRecording = () => {
+    if (recognition) {
+      recognition.stop();
+      recognition.onresult = null; // Clear onresult handler
+      recognition.onerror = null; // Clear onerror handler
+      recognition.onend = null; // Clear onend handler to prevent restarts
+    }
     setIsRecording(false);
     setSessionState("reviewing");
+    setInterimTranscript(""); // Clear interim transcript on stop
   };
 
   const submitResponse = () => {
@@ -218,10 +317,26 @@ export default function QA() {
   };
 
   const practiceAnother = () => {
-    setSessionState("setup");
-    setCurrentQuestion(null);
-    setTranscript("");
+    setSessionState("question");
+    const question = getRandomQuestion(questionType);
+    setCurrentQuestion(question);
+    setFinalTranscript("");
+    setInterimTranscript("");
     setFeedback(null);
+  };
+
+  const readQuestionAloud = (question) => {
+    if ("speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(question);
+      utterance.rate = 0.8;
+      utterance.pitch = 1;
+      speechSynthesis.speak(utterance);
+    } else {
+      enqueueSnackbar("Speech synthesis not supported in your browser.", {
+        variant: "warning",
+      });
+    }
   };
 
   const getDifficultyColor = (level) => {
@@ -229,7 +344,7 @@ export default function QA() {
       case "easy":
         return { bgcolor: "success.light", color: "success.main" };
       case "medium":
-        return { bgcolor: "#fef3c7", color: "#d97706" }; // Softer amber
+        return { bgcolor: "#fef3c7", color: "#d97706" };
       case "hard":
         return { bgcolor: "error.light", color: "error.main" };
       default:
@@ -251,107 +366,22 @@ export default function QA() {
         }}
       >
         <Box sx={{ maxWidth: "80vw", mx: "auto" }}>
-          {/* <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 4 }}> */}
-          <Button
-            startIcon={<ArrowBack />}
-            onClick={() => navigate("/dashboard")}
-            variant="outlined"
-            sx={{
-              mb: 2,
-              borderRadius: 2,
-              px: 3,
-              py: 1,
-              // backdropFilter: "blur(10px)",
-              backgroundColor: alpha(theme.palette.background.paper, 0.7),
-              "&:hover": {
-                backgroundColor: alpha(theme.palette.primary.main, 0.1),
-              },
-            }}
-          >
-            Back to Dashboard
-          </Button>
-          {/* </Box> */}
-
-          <Box sx={{ mb: 4 }}>
-            <Typography
-              variant="h3"
-              component="h1"
-              fontWeight="bold"
-              sx={{
-                background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                // mb: 1,
-                fontWeight: 600,
+          {questionType === "behavioral" && (
+            <BehavioralPopup
+              show={show}
+              onClose={() => {
+                setSessionState("setup");
+                setShow(false);
               }}
-            >
-              Q&A Practice
-            </Typography>
-            <Typography variant="h6" color="text.secondary" sx={{ mt: 1 }}>
-              Practice common interview questions and improve your answers.
-            </Typography>
-          </Box>
-
-          {sessionState === "setup" && (
-            <AnimatedCard>
-              <CardHeader
-                title={
-                  <Typography variant="h6">
-                    Set Up Your Practice Session
-                  </Typography>
-                }
-              />
-              <CardContent>
-                <Box
-                  sx={{
-                    display: "grid",
-                    gap: 3,
-                    gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
-                  }}
-                >
-                  <FormControl>
-                    <InputLabel id="question-type-label">
-                      Question Type
-                    </InputLabel>
-                    <Select
-                      labelId="question-type-label"
-                      value={questionType}
-                      label="Question Type"
-                      onChange={(e) => setQuestionType(e.target.value)}
-                      sx={{ borderRadius: "8px" }}
-                    >
-                      <MenuItem value="behavioral">Behavioral</MenuItem>
-                      <MenuItem value="technical">Technical</MenuItem>
-                    </Select>
-                  </FormControl>
-                  <FormControl>
-                    <InputLabel id="difficulty-level-label">
-                      Difficulty Level
-                    </InputLabel>
-                    <Select
-                      labelId="difficulty-level-label"
-                      value={difficulty}
-                      label="Difficulty Level"
-                      onChange={(e) => setDifficulty(e.target.value)}
-                      sx={{ borderRadius: "8px" }}
-                    >
-                      <MenuItem value="easy">Easy</MenuItem>
-                      <MenuItem value="medium">Medium</MenuItem>
-                      <MenuItem value="hard">Hard</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Box>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={startPractice}
-                  sx={{ mt: 3, width: { xs: "100%", sm: "auto" }, py: 1.5 }}
-                  aria-label="Start Practice Session"
-                >
-                  Start Practice Session
-                </Button>
-              </CardContent>
-            </AnimatedCard>
+              onStart={startPractice}
+            />
+          )}
+          {questionType === "technical" && (
+            <TechnicalPopup
+              show={show}
+              onClose={() => setSessionState("setup")}
+              onStart={startPractice}
+            />
           )}
 
           {(sessionState === "question" ||
@@ -362,7 +392,9 @@ export default function QA() {
                 <AnimatedCard>
                   <CardHeader
                     title={
-                      <Typography variant="h6">Current Question</Typography>
+                      <Typography variant="h5" sx={{ fontWeight: "600" }}>
+                        Current Question
+                      </Typography>
                     }
                     action={
                       sessionState === "question" && (
@@ -374,6 +406,7 @@ export default function QA() {
                           sx={{
                             color: "text.secondary",
                             borderColor: "grey.300",
+                            fontSize: "1.2rem",
                           }}
                         >
                           Skip Question
@@ -382,24 +415,7 @@ export default function QA() {
                     }
                   />
                   <CardContent>
-                    <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
-                      <Chip
-                        label={currentQuestion.type}
-                        sx={{
-                          textTransform: "capitalize",
-                          bgcolor: "grey.100",
-                          color: "grey.800",
-                        }}
-                      />
-                      <Chip
-                        label={currentQuestion.difficulty}
-                        sx={{
-                          textTransform: "capitalize",
-                          ...getDifficultyColor(currentQuestion.difficulty),
-                        }}
-                      />
-                    </Box>
-                    <Typography variant="body1">
+                    <Typography variant="h6" sx={{ fontWeight: "400" }}>
                       {currentQuestion.text}
                     </Typography>
                   </CardContent>
@@ -407,25 +423,29 @@ export default function QA() {
 
                 <AnimatedCard>
                   <CardHeader
-                    title={<Typography variant="h6">Your Response</Typography>}
+                    title={
+                      <Typography variant="h5" sx={{ fontWeight: "600" }}>
+                        Your Response
+                      </Typography>
+                    }
                   />
                   <CardContent sx={{ display: "grid", gap: 3 }}>
                     {sessionState === "question" && (
                       <Box sx={{ textAlign: "center", py: 4 }}>
                         <Button
-                          variant="contained"
+                          variant="outlined"
                           color="primary"
                           onClick={startRecording}
                           startIcon={<MicIcon />}
                           size="large"
                           aria-label="Start Recording"
-                          sx={{ py: 1.5 }}
+                          sx={{ py: 1.5, fontSize: "1.2rem" }}
                         >
                           Start Recording
                         </Button>
                         <Typography
                           variant="caption"
-                          sx={{ mt: 2, display: "block" }}
+                          sx={{ mt: 2, display: "block", fontSize: "1rem" }}
                         >
                           Click to start recording your response
                         </Typography>
@@ -434,7 +454,13 @@ export default function QA() {
 
                     {sessionState === "recording" && (
                       <Box sx={{ display: "grid", gap: 3 }}>
-                        <Box sx={{ textAlign: "center", py: 2 }}>
+                        <Box
+                          sx={{
+                            textAlign: "center",
+                            py: 2,
+                            fontSize: "1.2rem",
+                          }}
+                        >
                           <Box
                             sx={{
                               display: "inline-flex",
@@ -461,11 +487,14 @@ export default function QA() {
                           </Box>
                         </Box>
 
-                        {transcript && (
+                        {(finalTranscript || interimTranscript) && (
                           <Box>
                             <Typography
-                              variant="subtitle2"
-                              sx={{ mb: 1, fontWeight: 500 }}
+                              sx={{
+                                mb: 1,
+                                fontWeight: 400,
+                                fontSize: "1.2rem",
+                              }}
                             >
                               Live Transcript
                             </Typography>
@@ -476,20 +505,23 @@ export default function QA() {
                                 borderRadius: "8px",
                               }}
                             >
-                              <Typography variant="body2">
-                                {transcript}
+                              <Typography
+                                variant="h6"
+                                sx={{ fontWeight: "400" }}
+                              >
+                                {finalTranscript + interimTranscript}
                               </Typography>
                             </Box>
                           </Box>
                         )}
 
                         <Button
-                          variant="contained"
-                          color="secondary"
+                          variant="outlined"
+                          color="error"
                           onClick={stopRecording}
                           startIcon={<MicOffIcon />}
                           aria-label="Stop Recording"
-                          sx={{ py: 1.5 }}
+                          sx={{ py: 1.5, fontSize: "1.2rem" }}
                         >
                           Stop Recording
                         </Button>
@@ -500,31 +532,32 @@ export default function QA() {
                       <Box sx={{ display: "grid", gap: 3 }}>
                         <Box>
                           <Typography
-                            variant="subtitle2"
-                            sx={{ mb: 1, fontWeight: 500 }}
+                            sx={{ mb: 1, fontWeight: 400, fontSize: "1.2rem" }}
                           >
                             Edit Your Response
                           </Typography>
                           <TextField
-                            value={transcript}
-                            onChange={(e) => setTranscript(e.target.value)}
+                            value={finalTranscript}
+                            onChange={(e) => setFinalTranscript(e.target.value)}
                             multiline
                             minRows={6}
                             fullWidth
                             placeholder="Your response transcript..."
                             sx={{
+                              fontWeight: 400,
+                              fontSize: "6rem",
                               "& .MuiInputBase-root": { borderRadius: "8px" },
                             }}
                           />
                         </Box>
                         <Box sx={{ display: "flex", gap: 2 }}>
                           <Button
-                            variant="contained"
+                            variant="outlined"
                             color="primary"
                             onClick={submitResponse}
                             startIcon={<SendIcon />}
                             aria-label="Submit Response"
-                            sx={{ py: 1.5 }}
+                            sx={{ py: 1.5, fontSize: "1.2rem" }}
                           >
                             Submit Response
                           </Button>
@@ -533,7 +566,7 @@ export default function QA() {
                             onClick={startRecording}
                             startIcon={<MicIcon />}
                             aria-label="Record Again"
-                            sx={{ py: 1.5 }}
+                            sx={{ py: 1.5, fontSize: "1.2rem" }}
                           >
                             Record Again
                           </Button>
@@ -575,26 +608,10 @@ export default function QA() {
                       "&:hover": { transform: "scale(1.03)" },
                     }}
                   >
-                    <Typography variant="h6" color="primary">
+                    <Typography variant="h4" color="primary">
                       {feedback.overallScore}%
                     </Typography>
-                    <Typography variant="caption">Overall Score</Typography>
-                  </Box>
-                  <Box
-                    sx={{
-                      textAlign: "center",
-                      p: 3,
-                      bgcolor:
-                        "linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)",
-                      borderRadius: "8px",
-                      transition: "all 0.2s ease",
-                      "&:hover": { transform: "scale(1.03)" },
-                    }}
-                  >
-                    <Typography variant="h6" sx={{ color: "#d97706" }}>
-                      {feedback.repetitiveWords}
-                    </Typography>
-                    <Typography variant="caption">Repetitive Words</Typography>
+                    <Typography variant="h6">Overall Score</Typography>
                   </Box>
                   <Box
                     sx={{
@@ -607,10 +624,10 @@ export default function QA() {
                       "&:hover": { transform: "scale(1.03)" },
                     }}
                   >
-                    <Typography variant="h6" sx={{ color: "error.main" }}>
+                    <Typography variant="h4" sx={{ color: "error.main" }}>
                       {feedback.fillerWords}
                     </Typography>
-                    <Typography variant="caption">Filler Words</Typography>
+                    <Typography variant="h6">Filler Words</Typography>
                   </Box>
                   <Box
                     sx={{
@@ -623,10 +640,10 @@ export default function QA() {
                       "&:hover": { transform: "scale(1.03)" },
                     }}
                   >
-                    <Typography variant="h6" sx={{ color: "#d97706" }}>
+                    <Typography variant="h4" sx={{ color: "#d97706" }}>
                       {feedback.weakWords}
                     </Typography>
-                    <Typography variant="caption">Weak Words</Typography>
+                    <Typography variant="h6">Weak Words</Typography>
                   </Box>
                 </Box>
 
@@ -640,7 +657,7 @@ export default function QA() {
                     >
                       Summary
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body1" color="text.secondary">
                       {feedback.summary}
                     </Typography>
                   </Box>
@@ -654,7 +671,7 @@ export default function QA() {
                     <Box
                       sx={{ p: 2, bgcolor: "grey.100", borderRadius: "8px" }}
                     >
-                      <Typography variant="body2">
+                      <Typography variant="body1">
                         {feedback.sampleResponse}
                       </Typography>
                     </Box>
@@ -663,12 +680,12 @@ export default function QA() {
 
                 <Box sx={{ display: "flex", gap: 2, pt: 2 }}>
                   <Button
-                    variant="contained"
+                    variant="outlined"
                     color="primary"
                     onClick={practiceAnother}
                     startIcon={<RotateCcwIcon />}
                     aria-label="Practice Another Question"
-                    sx={{ py: 1.5 }}
+                    sx={{ py: 1.5, fontSize: "1.2rem" }}
                   >
                     Practice Another Question
                   </Button>
@@ -676,7 +693,7 @@ export default function QA() {
                     variant="outlined"
                     onClick={startPractice}
                     aria-label="Same Type & Difficulty"
-                    sx={{ py: 1.5 }}
+                    sx={{ py: 1.5, fontSize: "1.2rem" }}
                   >
                     Same Type & Difficulty
                   </Button>

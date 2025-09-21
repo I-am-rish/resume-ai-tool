@@ -324,6 +324,7 @@ const Menus = () => {
                     sx={{
                       color: isActive ? color : theme.palette.text.secondary,
                       minWidth: 40,
+                      fontSize: 20,
                     }}
                   >
                     {getIcon(icon)}
@@ -331,7 +332,7 @@ const Menus = () => {
                   <ListItemText
                     primary={
                       <Typography
-                        variant="body1"
+                        variant="h6"
                         fontWeight={isActive ? 600 : 500}
                         sx={{ textTransform: "capitalize" }}
                       >
@@ -360,12 +361,12 @@ const Menus = () => {
                   <Paper
                     elevation={0}
                     sx={{
-                      ml: 2,
-                      mr: 1,
+                      ml: 6,
+                      mr: 0,
                       mb: 1,
                       borderRadius: 2,
                       bgcolor: alpha(theme.palette.background.default, 0.5),
-                      border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                      // border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
                     }}
                   >
                     <List component="div" disablePadding>
@@ -404,7 +405,7 @@ const Menus = () => {
                                   <ListItemText
                                     primary={
                                       <Typography
-                                        variant="body2"
+                                        variant="body1"
                                         fontWeight={isChildActive ? 600 : 500}
                                         sx={{ textTransform: "capitalize" }}
                                       >

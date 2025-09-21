@@ -1519,6 +1519,7 @@ const CareerLanding = () => {
                   boxShadow: "0 6px 20px rgba(79, 70, 229, 0.4)",
                 },
               }}
+              onClick={() => navigate("/authentication/login")}
             >
               Start Your Success Story
             </Button>

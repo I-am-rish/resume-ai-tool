@@ -154,7 +154,7 @@ const ProfileModal = () => {
           // href="./authentication/login"
           className="dropdown-item"
           onClick={() => {
-            navigate("/authentication/login");
+            // navigate("/authentication/login");
             localStorage.clear();
             window.location.reload();
           }}

@@ -11,9 +11,11 @@ const RootLayout = () => {
 
     return (
         <>
-            <Header />
+            {/* <Header /> */}
             <NavigationManu />
-            <main className="nxl-container">
+            <main className="ml-5" style={{
+                marginLeft: "280px",
+            }}>
                 <div className="nxl-content">
                     <Outlet />
                 </div>

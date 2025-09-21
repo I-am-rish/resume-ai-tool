@@ -127,10 +127,14 @@ import {
 import { MdProductionQuantityLimits } from "react-icons/md";
 import { GoPackage } from "react-icons/go";
 import { LuLayoutDashboard } from "react-icons/lu";
+import { CgProfile } from "react-icons/cg";
+
 
 
 const getIcon = (name) => {
   switch (name) {
+    case "feather-profile":
+      return <CgProfile />;
     case "feather-dashboard":
       return <LuLayoutDashboard />;
     case "feather-students":

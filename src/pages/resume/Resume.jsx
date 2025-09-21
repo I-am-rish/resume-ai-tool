@@ -594,7 +594,6 @@
 //   );
 // }
 
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -604,6 +603,11 @@ import {
   ResponsiveContainer,
   Legend,
   Tooltip,
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  Radar,
 } from "recharts";
 import {
   Box,
@@ -780,8 +784,9 @@ const AnimatedCard = styled(Card)(({ theme }) => ({
 
 const StyledListItem = styled(ListItem)(({ theme }) => ({
   borderRadius: "8px",
-  padding: "12px 16px",
+  padding: "6px 16px",
   marginBottom: "8px",
+  /* boxShadow: "1px 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)", */
   transition: "all 0.2s ease",
   "&:hover": {
     backgroundColor: theme.palette.action.hover,
@@ -790,11 +795,11 @@ const StyledListItem = styled(ListItem)(({ theme }) => ({
 }));
 
 const ScoreCard = styled(Card)(({ theme }) => ({
-  background: `linear-gradient(135deg, ${alpha(
+  /* background: `linear-gradient(135deg, ${alpha(
     theme.palette.primary.main,
     0.05
   )} 0%, ${alpha(theme.palette.secondary.main, 0.05)} 100%)`,
-  border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+  border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`, */
 }));
 
 const StrengthCard = styled(Card)(({ theme }) => ({
@@ -883,6 +888,13 @@ const updatedResumeChanges = [
     updated:
       "• Optimized application performance resulting in 40% faster load times and $50K annual cost savings\n• Led development team of 6 engineers on 3 major product releases\n• Implemented ML-powered features increasing user engagement by 25%",
   },
+];
+const atsData = [
+  { metric: "Skills Match", value: 85 },
+  { metric: "Keyword Match", value: 72 },
+  { metric: "Experience Relevance", value: 90 },
+  { metric: "Education Fit", value: 65 },
+  { metric: "Overall Alignment", value: 80 },
 ];
 
 export default function Resume() {
@@ -977,16 +989,20 @@ export default function Resume() {
                 </Button>
               </Box>
               <Typography
-                variant="h4"
+                variant="h3"
+                component="h1"
+                fontWeight="bold"
                 sx={{
-                  fontWeight: 700,
-                  color: "#111827",
+                  /* background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent", */
+                  color: "#077fcf",
                   mb: 1,
                 }}
               >
                 Resume Analysis
               </Typography>
-              <Typography variant="body1" color="text.secondary">
+              <Typography variant="h6" color="text.secondary">
                 Comprehensive evaluation of your resume against job requirements
               </Typography>
             </Box>
@@ -994,9 +1010,9 @@ export default function Resume() {
               variant="contained"
               color="primary"
               onClick={handleUpdateResume}
-              startIcon={<DownloadIcon />}
               sx={{
                 fontWeight: 600,
+                fontSize: "1.1rem",
                 px: 3,
                 py: 1.5,
                 boxShadow:
@@ -1012,8 +1028,8 @@ export default function Resume() {
           <Box
             sx={{
               display: "grid",
-              gridTemplateColumns: { xs: "1fr", lg: "3fr 1fr" },
-              gap: 3,
+              gridTemplateColumns: { xs: "2fr", lg: "2fr 1fr 1fr" },
+              gap: 2,
             }}
           >
             {/* Summary Card */}
@@ -1022,7 +1038,7 @@ export default function Resume() {
                 title={
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
                     <InsightsIcon color="primary" />
-                    <Typography variant="h6" fontWeight="600">
+                    <Typography variant="h5" fontWeight="600">
                       Job Fit Analysis Summary
                     </Typography>
                   </Box>
@@ -1030,9 +1046,9 @@ export default function Resume() {
               />
               <CardContent>
                 <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ mb: 2 }}
+                  /* variant="h6" */
+                  /* color="text.secondary" */
+                  sx={{ mb: 2, fontWeight: 400, fontSize: "1.2rem" }}
                 >
                   Your resume shows strong alignment with the Senior Software
                   Engineer position at TechCorp. You have excellent technical
@@ -1040,7 +1056,7 @@ export default function Resume() {
                   requirements.
                 </Typography>
                 <Divider sx={{ my: 2 }} />
-                <Typography variant="body2" color="text.secondary">
+                <Typography sx={{ fontSize: "1.2rem" }}>
                   However, there are opportunities to strengthen your profile by
                   adding quantified achievements and highlighting experience
                   with Python and machine learning technologies mentioned in the
@@ -1075,11 +1091,69 @@ export default function Resume() {
               </CardContent>
             </AnimatedCard>
 
+            {/*ATS Score Card */}
+            <ScoreCard>
+              <CardHeader
+                title={
+                  <Typography variant="h5" fontWeight="600">
+                    ATS Score
+                  </Typography>
+                }
+              />
+              <CardContent>
+                <Box sx={{ height: 220 }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={scoreData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={50}
+                        outerRadius={90}
+                        paddingAngle={5}
+                        dataKey="value"
+                      >
+                        {scoreData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.fill} />
+                        ))}
+                      </Pie>
+                      <Tooltip
+                        contentStyle={{
+                          borderRadius: "8px",
+                          boxShadow:
+                            "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+                        }}
+                      />
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </Box>
+                <Box sx={{ textAlign: "center", mt: 2 }}>
+                  <Typography variant="h4" color="primary" fontWeight={700}>
+                    78/100
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    Strong Match
+                  </Typography>
+                  <LinearProgress
+                    variant="determinate"
+                    value={78}
+                    sx={{
+                      mt: 1.5,
+                      height: 6,
+                      borderRadius: 3,
+                      backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                    }}
+                  />
+                </Box>
+              </CardContent>
+            </ScoreCard>
+
             {/* Score Card */}
             <ScoreCard>
               <CardHeader
                 title={
-                  <Typography variant="h6" fontWeight="600">
+                  <Typography variant="h5" fontWeight="600">
                     Job Fit Score
                   </Typography>
                 }
@@ -1149,7 +1223,7 @@ export default function Resume() {
                 title={
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
                     <CheckCircleIcon color="secondary" />
-                    <Typography variant="h6" fontWeight="600">
+                    <Typography variant="h5" fontWeight="600">
                       Key Strengths
                     </Typography>
                   </Box>
@@ -1160,11 +1234,11 @@ export default function Resume() {
                   {keyStrengths.map((strength, index) => (
                     <StyledListItem key={index} disablePadding>
                       <ListItemIcon>
-                        <CheckCircleIcon color="secondary" fontSize="small" />
+                        <CheckCircleIcon color="secondary" fontSize="medium" />
                       </ListItemIcon>
                       <ListItemText
                         primary={strength}
-                        primaryTypographyProps={{ variant: "body2" }}
+                        /* primaryTypographyProps={{ variant: "body1" }} */
                       />
                     </StyledListItem>
                   ))}
@@ -1178,7 +1252,7 @@ export default function Resume() {
                 title={
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
                     <AlertCircleIcon sx={{ color: "warning.main" }} />
-                    <Typography variant="h6" fontWeight="600">
+                    <Typography variant="h5" fontWeight="600">
                       Skills Gap
                     </Typography>
                   </Box>
@@ -1191,12 +1265,12 @@ export default function Resume() {
                       <ListItemIcon>
                         <AlertCircleIcon
                           sx={{ color: "warning.main" }}
-                          fontSize="small"
+                          fontSize="medium"
                         />
                       </ListItemIcon>
                       <ListItemText
                         primary={skill}
-                        primaryTypographyProps={{ variant: "body2" }}
+                        /* primaryTypographyProps={{ variant: "body2" }} */
                       />
                     </StyledListItem>
                   ))}
@@ -1220,7 +1294,7 @@ export default function Resume() {
                 title={
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
                     <ErrorOutlineIcon sx={{ color: "error.main" }} />
-                    <Typography variant="h6" fontWeight="600">
+                    <Typography variant="h5" fontWeight="600">
                       Missing Achievements
                     </Typography>
                   </Box>
@@ -1233,12 +1307,12 @@ export default function Resume() {
                       <ListItemIcon>
                         <ErrorOutlineIcon
                           sx={{ color: "error.main" }}
-                          fontSize="small"
+                          fontSize="medium"
                         />
                       </ListItemIcon>
                       <ListItemText
                         primary={achievement}
-                        primaryTypographyProps={{ variant: "body2" }}
+                        /* primaryTypographyProps={{ variant: "body2" }} */
                       />
                     </StyledListItem>
                   ))}
@@ -1252,7 +1326,7 @@ export default function Resume() {
                 title={
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
                     <LightbulbIcon color="info" />
-                    <Typography variant="h6" fontWeight="600">
+                    <Typography variant="h5" fontWeight="600">
                       Key Recommendations
                     </Typography>
                   </Box>
@@ -1263,11 +1337,11 @@ export default function Resume() {
                   {recommendations.map((recommendation, index) => (
                     <StyledListItem key={index} disablePadding>
                       <ListItemIcon>
-                        <LightbulbIcon color="info" fontSize="small" />
+                        <LightbulbIcon color="info" fontSize="medium" />
                       </ListItemIcon>
                       <ListItemText
                         primary={recommendation}
-                        primaryTypographyProps={{ variant: "body2" }}
+                        /* primaryTypographyProps={{ variant: "body2" }} */
                       />
                     </StyledListItem>
                   ))}
@@ -1303,7 +1377,7 @@ export default function Resume() {
               Review Resume Changes
             </DialogTitle>
             <DialogContent sx={{ maxHeight: "70vh", overflowY: "auto", pt: 2 }}>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              <Typography variant="h6" color="text.secondary" sx={{ mb: 3 }}>
                 {changesSaved
                   ? "Your resume has been successfully updated with the recommended changes. You can now download the updated version."
                   : "Review the proposed changes to your resume based on the job requirements and recommendations."}
@@ -1322,7 +1396,7 @@ export default function Resume() {
                 >
                   <CardHeader
                     title={
-                      <Typography variant="h6" fontWeight={600}>
+                      <Typography variant="h5" fontWeight={600}>
                         {change.section}
                       </Typography>
                     }
@@ -1333,12 +1407,12 @@ export default function Resume() {
                       <Typography
                         variant="subtitle2"
                         color="error.main"
-                        sx={{ mb: 1, fontWeight: 500 }}
+                        sx={{ mb: 1, fontWeight: 500, fontSize: "1.1rem" }}
                       >
                         Original:
                       </Typography>
                       <Typography
-                        variant="body2"
+                        variant="h6"
                         sx={{
                           p: 2,
                           bgcolor: alpha(theme.palette.error.main, 0.05),
@@ -1346,6 +1420,7 @@ export default function Resume() {
                           border: 1,
                           borderColor: theme.palette.error.main,
                           whiteSpace: "pre-line",
+                          fontWeight: 400,
                         }}
                       >
                         {change.original}
@@ -1355,12 +1430,12 @@ export default function Resume() {
                       <Typography
                         variant="subtitle2"
                         color="secondary.main"
-                        sx={{ mb: 1, fontWeight: 500 }}
+                        sx={{ mb: 1, fontWeight: 500, fontSize: "1.1rem" }}
                       >
                         Updated:
                       </Typography>
                       <Typography
-                        variant="body2"
+                        variant="h6"
                         sx={{
                           p: 2,
                           bgcolor: alpha(theme.palette.secondary.main, 0.05),
@@ -1368,6 +1443,8 @@ export default function Resume() {
                           border: 1,
                           borderColor: theme.palette.secondary.main,
                           whiteSpace: "pre-line",
+                          /* fontSize: "1rem" */
+                          fontWeight: 400,
                         }}
                       >
                         {change.updated}
@@ -1393,7 +1470,7 @@ export default function Resume() {
                     color="primary"
                     onClick={handleDownloadResume}
                     startIcon={<DownloadIcon />}
-                    sx={{ borderRadius: "8px" }}
+                    sx={{ borderRadius: "8px", fontSize: "1rem" }}
                     aria-label="Download Updated Resume"
                   >
                     Download Resume
@@ -1416,10 +1493,10 @@ export default function Resume() {
                     color="primary"
                     onClick={handleSaveChanges}
                     startIcon={<SaveIcon />}
-                    sx={{ borderRadius: "8px" }}
-                    aria-label="Save Changes"
+                    sx={{ borderRadius: "8px", fontSize: "1rem" }}
+                    aria-label="Save changes to resume"
                   >
-                    Save Changes
+                    Save changes to resume
                   </Button>
                 </>
               )}

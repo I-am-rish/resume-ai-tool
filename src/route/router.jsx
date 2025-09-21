@@ -6,8 +6,6 @@ import LoginCover from "../pages/login-cover";
 
 // import LayoutSetting from "../layout/layoutSetting";
 
-
-
 import LayoutAuth from "../layout/layoutAuth";
 import ProtectedRoute from "../components/ProtectedRoute";
 import Unauthorized from "../pages/Unauthorized";
@@ -22,11 +20,13 @@ import Landing from "../pages/landing-page/Landing";
 import Resume from "../pages/resume/Resume";
 import CoverLetter from "../pages/cover-letter/CoverLetter";
 import QAndA from "../pages/q&a/QAndA";
+import BehavioralPopup from "../pages/q&a/BehavioralPopup";
+import TechnicalPopup from "../pages/q&a/TechnicalPopup";
 import Interview from "../pages/interview/Interview";
 import Analytics from "../pages/analytics/Analytics";
 import Archive from "../pages/archive/Archive";
-
-
+import Profile from "../pages/profile/Profile";
+import Logout from "../pages/Logout";
 
 const routes = [
   {
@@ -35,11 +35,7 @@ const routes = [
     children: [
       {
         path: "/",
-        element: (
-          <ProtectedRoute>
-            <Landing />
-          </ProtectedRoute>
-        ),
+        element: <Landing />,
       },
     ],
   },
@@ -51,7 +47,7 @@ const routes = [
         path: "/dashboard",
         element: (
           // <ProtectedRoute>
-            <Dashboard />
+          <Dashboard />
           // </ProtectedRoute>
         ),
       },
@@ -59,7 +55,7 @@ const routes = [
         path: "/resume",
         element: (
           // <ProtectedRoute>
-            <Resume />
+          <Resume />
           // </ProtectedRoute>
         ),
       },
@@ -67,15 +63,31 @@ const routes = [
         path: "/cover-letter",
         element: (
           // <ProtectedRoute>
-            <CoverLetter />
+          <CoverLetter />
+          // </ProtectedRoute>
+        ),
+      },
+      // {
+      //   path: "/q-and-a",
+      //   element: (
+      //     // <ProtectedRoute>
+      //     <QAndA />
+      //     // </ProtectedRoute>
+      //   ),
+      // },
+      {
+        path: "/behavioral",
+        element: (
+          // <ProtectedRoute>
+          <QAndA />
           // </ProtectedRoute>
         ),
       },
       {
-        path: "/q-and-a",
+        path: "/technical",
         element: (
           // <ProtectedRoute>
-            <QAndA />
+          <QAndA />
           // </ProtectedRoute>
         ),
       },
@@ -83,7 +95,7 @@ const routes = [
         path: "/interview",
         element: (
           // <ProtectedRoute>
-            <Interview />
+          <Interview />
           // </ProtectedRoute>
         ),
       },
@@ -91,7 +103,7 @@ const routes = [
         path: "/analytics",
         element: (
           // <ProtectedRoute>
-            <Analytics />
+          <Analytics />
           // </ProtectedRoute>
         ),
       },
@@ -99,14 +111,28 @@ const routes = [
         path: "/archive",
         element: (
           // <ProtectedRoute>
-            <Archive />
+          <Archive />
           // </ProtectedRoute>
         ),
       },
-
+      {
+        path: "/profile",
+        element: (
+          // <ProtectedRoute>
+          <Profile />
+          // </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/logout",
+        element: (
+          // <ProtectedRoute>
+          <Logout />
+          // </ProtectedRoute>
+        ),
+      },
     ],
   },
- 
 
   {
     path: "/",

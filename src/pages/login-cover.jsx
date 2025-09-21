@@ -14,6 +14,8 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
+import httpClient from "@/utils/httpClinet";
+import {useSnackbar} from "notistack"
 
 const StyledCard = styled(Card)(({ theme }) => ({
   borderRadius: 16,
@@ -170,18 +172,41 @@ const AuthComponent = () => {
     confirmPassword: "",
   });
 
+  const {enqueueSnackbar} = useSnackbar();
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (isSignup && formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match!");
-      return;
-    }
+    // if (isSignup && formData.password !== formData.confirmPassword) {
+    //   alert("Passwords do not match!");
+    //   return;
+    // }
     console.log("Form submitted:", { ...formData, isSignup });
     // Add your authentication logic here
+    if (isSignup) {
+       httpClient
+         .post("/sign-up", formData)
+         .then((res) => {
+           console.log("auth res => ", res);
+         })
+         .catch((err) => {
+           console.log("err => ", err.response.data.message);
+           enqueueSnackbar(err.response.data.message, { variant: "error" });
+         });
+     }else{
+       httpClient
+         .post("/login", {email: formData?.email, password: formData?.password})
+         .then((res) => {
+           console.log("auth login res => ", res);
+         })
+         .catch((err) => {
+           console.log("err => ", err.response.data.message);
+           enqueueSnackbar(err.response.data.message, { variant: "error" });
+         });
+     }
   };
 
   const toggleAuthMode = () => setIsSignup(!isSignup);
@@ -246,7 +271,7 @@ const AuthComponent = () => {
           overflow: "hidden",
         }}
       >
-        <DigitalGrid />
+        {/* <DigitalGrid />
         <BinaryStream />
         {nodes.map((node) => (
           <Node
@@ -256,7 +281,7 @@ const AuthComponent = () => {
             delay={node.delay}
             style={{ left: `${node.x}vw`, top: `${node.y}vh` }}
           />
-        ))}
+        ))} */}
       </Box>
 
       <StyledCard
@@ -320,7 +345,7 @@ const AuthComponent = () => {
               initial="initial"
               animate="animate"
               exit="exit"
-              onSubmit={handleSubmit}
+              onSubmit={handleSubmit} // ← Fixed: Pass the handler function directly
               sx={{ display: "flex", flexDirection: "column", gap: 5 }} // Increased gap to 5 for input fields
             >
               {isSignup && (
@@ -441,7 +466,6 @@ const AuthComponent = () => {
                   // container
                   spacing={3}
                   justifyContent="center"
-                 
                 >
                   {" "}
                   {/* Increased spacing to 3 */}
@@ -502,7 +526,7 @@ const AuthComponent = () => {
                   cursor: "pointer",
                   "&:hover": { textDecoration: "underline", color: "#A855F7" },
                 }}
-                onClick={toggleAuthMode}
+                onClick={() => toggleAuthMode()}
               >
                 {isSignup
                   ? "Already have an account? Sign in"

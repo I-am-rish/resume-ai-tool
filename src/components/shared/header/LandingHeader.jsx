@@ -136,7 +136,7 @@ const Navbar = () => {
                     transform: "translateY(-2px)",
                   },
                 }}
-                onClick={() => navigate("/authentication/login")}
+                // onClick={() => navigate("/authentication/login")}
               >
                 Get Started
               </Button>
@@ -252,7 +252,7 @@ const Navbar = () => {
                     transform: "translateY(-2px)",
                   },
                 }}
-                onClick={() => navigate("/authentication/login")}
+                // onClick={() => navigate("/authentication/login")}
               >
                 Get Started
               </Button>

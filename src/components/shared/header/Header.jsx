@@ -127,7 +127,7 @@ const Header = () => {
   };
 
   return (
-    <header className="nxl-header">
+    <header className="nxl-header ">
       <div className="header-wrapper">
         {/* <!--! [Start] Header Left !--> */}
         <div className="header-left d-flex align-items-center gap-4">
@@ -192,15 +192,7 @@ const Header = () => {
               <FiArrowRight size={24} />
             </a>
           </div>
-          {/* <!--! [End] nxl-navigation-toggle !-->
-                    <!--! [Start] nxl-lavel-mega-menu-toggle !--> */}
-          {/* <div className="nxl-lavel-mega-menu-toggle d-flex d-lg-none">
-                        <a href="#" onClick={(e) => {e.preventDefault(), setOpenMegaMenu(true)}} id="nxl-lavel-mega-menu-open">
-                            <FiAlignLeft size={24} />
-                        </a>
-                    </div> */}
-          {/* <!--! [End] nxl-lavel-mega-menu-toggle !-->
-                    <!--! [Start] nxl-lavel-mega-menu !--> */}
+          
           <div className="nxl-drp-link nxl-lavel-mega-menu">
             <div className="nxl-lavel-mega-menu-toggle d-flex d-lg-none">
               <a
@@ -216,7 +208,6 @@ const Header = () => {
                 <span>Back</span>
               </a>
             </div>
-            {/* <!--! [Start] nxl-lavel-mega-menu-wrapper !--> */}
             <div className="nxl-lavel-mega-menu-wrapper d-flex gap-3">
               {/* <HeaderDropDownModal /> */}
               {/* <MegaMenu /> */}
@@ -265,7 +256,6 @@ const Header = () => {
             <ProfileModal />
           </div>
         </div>
-        {/* <!--! [End] Header Right !--> */}
       </div>
     </header>
   );

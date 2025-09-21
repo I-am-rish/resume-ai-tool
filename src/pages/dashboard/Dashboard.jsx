@@ -10,7 +10,7 @@ import {
   TableCell,
   TableHead,
   TableRow,
-  Checkbox,
+  Radio,
   Chip,
   Dialog,
   DialogTitle,
@@ -32,12 +32,136 @@ import WorkIcon from "@mui/icons-material/Work";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import PeopleIcon from "@mui/icons-material/People";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
+import "bootstrap/dist/css/bootstrap.min.css";
+import { Card } from "react-bootstrap";
+import Header from "@/components/shared/header/Header";
+
+import "animate.css";
+import {
+  FaChartLine,
+  FaClipboardList,
+  FaUsers,
+  FaUserTie,
+} from "react-icons/fa6";
+
+// const CreateRecordModal = ({ isOpen, onClose, onSave }) => {
+//   const [formData, setFormData] = useState({
+//     resumeFile: null,
+//     jobTitle: "",
+//     companyName: "",
+//   });
+//   const [loading, setLoading] = useState(false);
+
+//   const handleFileChange = (e) => {
+//     setFormData((prev) => ({ ...prev, resumeFile: e.target.files[0] }));
+//   };
+
+//   const handleTextChange = (e) => {
+//     const { name, value } = e.target;
+//     setFormData((prev) => ({ ...prev, [name]: value }));
+//   };
+
+//   const handleSubmit = () => {
+//     if (!formData.jobTitle.trim()) {
+//       alert("Job title is required");
+//       return;
+//     }
+//     setLoading(true);
+//     setTimeout(() => {
+//       onSave(formData);
+//       setLoading(false);
+//       onClose();
+//       setFormData({ resumeFile: null, jobTitle: "", companyName: "" });
+//     }, 1000); // Simulate API delay
+//   };
+
+//   return (
+//     <Dialog open={isOpen} onClose={onClose} maxWidth="sm" fullWidth>
+//       <DialogTitle sx={{ fontWeight: 600, color: "#4F46E5" }}>
+//         Create New Record
+//       </DialogTitle>
+//       <DialogContent>
+//         <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 2 }}>
+//           <TextField
+//             label="Job Title"
+//             name="jobTitle"
+//             value={formData.jobTitle}
+//             onChange={handleTextChange}
+//             fullWidth
+//             required
+//             sx={{
+//               "& .MuiOutlinedInput-root": {
+//                 borderRadius: 2,
+//                 "&:hover fieldset": { borderColor: "#4F46E5" },
+//                 "&.Mui-focused fieldset": { borderColor: "#4F46E5" },
+//               },
+//             }}
+//             aria-label="Job title"
+//           />
+//           <TextField
+//             label="Company Name"
+//             name="companyName"
+//             value={formData.companyName}
+//             onChange={handleTextChange}
+//             fullWidth
+//             sx={{
+//               "& .MuiOutlinedInput-root": {
+//                 borderRadius: 2,
+//                 "&:hover fieldset": { borderColor: "#4F46E5" },
+//                 "&.Mui-focused fieldset": { borderColor: "#4F46E5" },
+//               },
+//             }}
+//             aria-label="Company name"
+//           />
+//           <TextField
+//             type="file"
+//             label="Resume File"
+//             onChange={handleFileChange}
+//             InputLabelProps={{ shrink: true }}
+//             fullWidth
+//             sx={{
+//               "& .MuiOutlinedInput-root": {
+//                 borderRadius: 2,
+//                 "&:hover fieldset": { borderColor: "#4F46E5" },
+//                 "&.Mui-focused fieldset": { borderColor: "#4F46E5" },
+//               },
+//             }}
+//             aria-label="Resume file upload"
+//           />
+//         </Box>
+//       </DialogContent>
+//       <DialogActions>
+//         <Button
+//           onClick={onClose}
+//           sx={{ textTransform: "none", color: "#4F46E5" }}
+//           aria-label="Cancel"
+//         >
+//           Cancel
+//         </Button>
+//         <LoadingButton
+//           onClick={handleSubmit}
+//           loading={loading}
+//           loadingPosition="start"
+//           variant="contained"
+//           sx={{
+//             textTransform: "none",
+//             bgcolor: "#4F46E5",
+//             "&:hover": { bgcolor: "#6366F1" },
+//           }}
+//           aria-label="Save record"
+//         >
+//           Save
+//         </LoadingButton>
+//       </DialogActions>
+//     </Dialog>
+//   );
+// };
 
 const CreateRecordModal = ({ isOpen, onClose, onSave }) => {
   const [formData, setFormData] = useState({
     resumeFile: null,
     jobTitle: "",
-    companyName: "",
+    jobDescription: "",
   });
   const [loading, setLoading] = useState(false);
 
@@ -60,17 +184,46 @@ const CreateRecordModal = ({ isOpen, onClose, onSave }) => {
       onSave(formData);
       setLoading(false);
       onClose();
-      setFormData({ resumeFile: null, jobTitle: "", companyName: "" });
+      setFormData({ resumeFile: null, jobTitle: "", jobDescription: "" });
     }, 1000); // Simulate API delay
   };
 
   return (
-    <Dialog open={isOpen} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle sx={{ fontWeight: 600, color: "#4F46E5" }}>
+    <Dialog
+      open={isOpen}
+      onClose={onClose}
+      maxWidth="md"
+      fullWidth
+      PaperProps={{
+        sx: {
+          borderRadius: 4,
+          minHeight: 400,
+          maxHeight: 600,
+          px: { xs: 2, sm: 4 },
+          py: { xs: 2, sm: 3 },
+        },
+      }}
+    >
+      <DialogTitle
+        sx={{
+          fontWeight: 700,
+          fontSize: "1.5rem",
+          color: "#4F46E5",
+          // mb: 1,
+        }}
+      >
         Create New Record
       </DialogTitle>
-      <DialogContent>
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 2 }}>
+
+      <DialogContent sx={{ px: 0 }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 3,
+            mt: 1,
+          }}
+        >
           <TextField
             label="Job Title"
             name="jobTitle"
@@ -78,6 +231,8 @@ const CreateRecordModal = ({ isOpen, onClose, onSave }) => {
             onChange={handleTextChange}
             fullWidth
             required
+            InputProps={{ sx: { fontSize: "1rem" } }}
+            InputLabelProps={{ sx: { fontSize: "0.95rem" } }}
             sx={{
               "& .MuiOutlinedInput-root": {
                 borderRadius: 2,
@@ -87,12 +242,17 @@ const CreateRecordModal = ({ isOpen, onClose, onSave }) => {
             }}
             aria-label="Job title"
           />
+
           <TextField
-            label="Company Name"
-            name="companyName"
-            value={formData.companyName}
+            label="Job Description"
+            name="jobDescription"
+            value={formData.jobDescription}
             onChange={handleTextChange}
+            multiline
+            minRows={4}
             fullWidth
+            // InputProps={{ sx: { fontSize: "1.1rem" } }}
+            // InputLabelProps={{ sx: { fontSize: "0.95rem" } }}
             sx={{
               "& .MuiOutlinedInput-root": {
                 borderRadius: 2,
@@ -100,29 +260,49 @@ const CreateRecordModal = ({ isOpen, onClose, onSave }) => {
                 "&.Mui-focused fieldset": { borderColor: "#4F46E5" },
               },
             }}
-            aria-label="Company name"
+            aria-label="Job description"
           />
-          <TextField
-            type="file"
-            label="Resume File"
-            onChange={handleFileChange}
-            InputLabelProps={{ shrink: true }}
-            fullWidth
+
+          <Button
+            variant="outlined"
+            component="label"
             sx={{
-              "& .MuiOutlinedInput-root": {
-                borderRadius: 2,
-                "&:hover fieldset": { borderColor: "#4F46E5" },
-                "&.Mui-focused fieldset": { borderColor: "#4F46E5" },
+              textTransform: "none",
+              borderRadius: 2,
+              borderColor: "#4F46E5",
+              color: "#4F46E5",
+              fontSize: "1.2rem",
+              "&:hover": {
+                // borderColor: "#6366F1",
+                // backgroundColor: "#f3f4f6",
               },
             }}
-            aria-label="Resume file upload"
-          />
+          >
+            Upload Resume File
+            <input
+              type="file"
+              hidden
+              onChange={handleFileChange}
+              aria-label="Resume file upload"
+            />
+          </Button>
+          {formData.resumeFile && (
+            <Typography variant="body2" sx={{ color: "#6B7280", ml: 1 }}>
+              Selected file: {formData.resumeFile.name}
+            </Typography>
+          )}
         </Box>
       </DialogContent>
-      <DialogActions>
+
+      <DialogActions sx={{ px: 0, pt: 3 }}>
         <Button
           onClick={onClose}
-          sx={{ textTransform: "none", color: "#4F46E5" }}
+          sx={{
+            textTransform: "none",
+            color: "#4F46E5",
+            fontWeight: 500,
+            fontSize: "1.2rem",
+          }}
           aria-label="Cancel"
         >
           Cancel
@@ -131,11 +311,13 @@ const CreateRecordModal = ({ isOpen, onClose, onSave }) => {
           onClick={handleSubmit}
           loading={loading}
           loadingPosition="start"
-          startIcon={<AddIcon />}
           variant="contained"
           sx={{
             textTransform: "none",
             bgcolor: "#4F46E5",
+            fontSize: "1.2rem",
+            fontWeight: 500,
+            px: 3,
             "&:hover": { bgcolor: "#6366F1" },
           }}
           aria-label="Save record"
@@ -167,9 +349,26 @@ export default function Dashboard() {
       lastModified: new Date("2024-01-10"),
     },
   ]);
-  const [selectedRecords, setSelectedRecords] = useState(new Set());
+  const [selectedRecord, setSelectedRecord] = useState(null); // Single selection with radio buttons
   const [loading, setLoading] = useState(false);
   const username = "John";
+
+  const stats = [
+    {
+      title: "Resume Updates",
+      value: 12,
+      icon: <FaClipboardList />,
+      color: "primary",
+    },
+    { title: "Cover Letters", value: 5, icon: <FaUserTie />, color: "info" },
+    { title: "Q&A Practice", value: 8, icon: <FaUsers />, color: "warning" },
+    {
+      title: "Interviews Conducted",
+      value: "85%",
+      icon: <FaChartLine />,
+      color: "success",
+    },
+  ];
 
   const handleSaveRecord = (newRecord) => {
     setLoading(true);
@@ -187,17 +386,11 @@ export default function Dashboard() {
     }, 1000); // Simulate API delay
   };
 
-  const toggleRecordSelection = (recordId) => {
-    const newSelected = new Set(selectedRecords);
-    if (newSelected.has(recordId)) {
-      newSelected.delete(recordId);
-    } else {
-      newSelected.add(recordId);
-    }
-    setSelectedRecords(newSelected);
+  const handleRecordSelection = (recordId) => {
+    setSelectedRecord(recordId === selectedRecord ? null : recordId); // Toggle selection
   };
 
-  const hasSelectedRecords = selectedRecords.size > 0;
+  const hasSelectedRecord = selectedRecord !== null;
 
   const theme = createTheme({
     palette: {
@@ -249,95 +442,89 @@ export default function Dashboard() {
   });
 
   return (
-    <ThemeProvider theme={theme}>
-      <Box
-        sx={{
-          flex: 1,
-          p: { xs: 2, sm: 3, md: 6 },
-          minHeight: "100vh",
-          bgcolor: "background.default",
-          backgroundImage: `linear-gradient(135deg, ${alpha(
-            theme.palette.primary.main,
-            0.05
-          )} 0%, ${alpha(theme.palette.secondary.main, 0.05)} 100%)`,
-        }}
-      >
-        {/* Welcome Section */}
-        <Box sx={{ mb: { xs: 4, md: 6 } }}>
-          <Typography
-            // variant="h4"
-            // sx={{
-            //   fontWeight: 700,
-            //   color: "#1F2937",
-            //   mb: { xs: 1, md: 2 },
-            //   fontSize: { xs: "1.5rem", sm: "1.75rem", md: "2.25rem" },
-            // }}
-            variant="h3"
-            component="h1"
-            fontWeight="bold"
-            sx={{
-              background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              mb: 1,
-            }}
-          >
-            Welcome back,{" "}<span
-              style={{
-                background: `linear-gradient( ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                // mb: 1,
+    <>
+      <Header />
+      <ThemeProvider theme={theme}>
+        <Box
+          sx={{
+            flex: 1,
+            p: { xs: 2, sm: 3, md: 6 },
+            pt: { xs: 4, md: 15 },
+            minHeight: "100vh",
+            bgcolor: "background.default",
+            backgroundImage: `linear-gradient(135deg, ${alpha(
+              theme.palette.primary.main,
+              0.05
+            )} 0%, ${alpha(theme.palette.secondary.main, 0.05)} 100%)`,
+          }}
+        >
+          {/* Welcome Section */}
+          <Box sx={{ mb: { xs: 4, md: 6 } }}>
+            <Typography
+              variant="h3"
+              component="h1"
+              fontWeight="bold"
+              sx={{
+                // background: `linear-gradient(10deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                // WebkitBackgroundClip: "text",
+                // WebkitTextFillColor: "transparent",
+                color: "#077fcf",
+                mb: 1,
               }}
             >
-              {username}!
-            </span>
-          </Typography>
-          <Typography
-            sx={{
-              color: "#6B7280",
-              fontSize: { xs: "0.9rem", sm: "1rem", md: "1.125rem" },
-            }}
-          >
-            Manage your job applications and track your career progress.
-          </Typography>
-        </Box>
+              Welcome back,{" "}
+              <span
+                style={{
+                  background: `linear-gradient(${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                }}
+              >
+                {username}!
+              </span>
+            </Typography>
+            <Typography
+              sx={{
+                color: "#6B7280",
+                fontSize: { xs: "0.9rem", sm: "1rem", md: "1.125rem" },
+              }}
+            >
+              Manage your job applications and track your career progress.
+            </Typography>
+          </Box>
 
-        {/* Quick Stats */}
-        <Grid
-          // container
-          spacing={{ xs: 2, sm: 3, md: 4 }}
-          sx={{ mb: { xs: 4, md: 6 } }}
+          {/* Quick Stats */}
+          {/* <Grid
           display="flex"
-          flexWrap={"wrap"}
+          flexWrap="wrap"
           alignItems="flex-end"
-          // justifyContent="center"
           gap={2}
+          sx={{ mb: { xs: 4, md: 6 } }}
         >
           {[
             {
-              title: "Total Applications",
+              title: "Resume Updates",
               value: records.length,
               icon: <WorkIcon />,
               color: theme.palette.primary.main,
               bgColor: alpha(theme.palette.primary.main, 0.1),
             },
             {
-              title: "This Month",
+              title: "Cover Letters",
               value: 2,
               icon: <CalendarMonthIcon />,
               color: theme.palette.info.main,
               bgColor: alpha(theme.palette.info.main, 0.1),
             },
             {
-              title: "Interviews",
+              title: "Q&A Practice",
               value: 1,
               icon: <PeopleIcon />,
               color: theme.palette.warning.main,
               bgColor: alpha(theme.palette.warning.main, 0.1),
             },
             {
-              title: "Success Rate",
+              title: "Interviews Conducted",
               value: "85%",
               icon: <TrendingUpIcon />,
               color: theme.palette.success.main,
@@ -349,22 +536,7 @@ export default function Dashboard() {
                 elevation={0}
                 sx={{
                   p: { xs: 1.5, sm: 3, md: 2 },
-                  minWidth: {
-                    lxs: 900,
-                    xs: 350,
-                    sm: 270,
-                    md: 400,
-                    lg: 240,
-                    xl: 270,
-                  },
-                  // width: 300,
-                  // maxWidth: {
-                  //   xs: 300,
-                  //   sm: "100%",
-                  //   md: 400,
-                  //   lg: 420,
-                  //   xl: 450,
-                  // },
+                  minWidth: { xs: 350, sm: 270, md: 450, lg: 300, xl: 350 },
                   borderRadius: 3,
                   background: "white",
                   boxShadow: "0 4px 12px rgba(0, 0, 0, 0.05)",
@@ -377,7 +549,6 @@ export default function Dashboard() {
                   display: "flex",
                   justifyContent: "space-between",
                   position: "relative",
-
                   overflow: "hidden",
                   "&::before": {
                     content: '""',
@@ -394,10 +565,10 @@ export default function Dashboard() {
                 <Box sx={{ textAlign: "left", maxWidth: "95%" }}>
                   <Typography
                     sx={{
-                      fontWeight: 600,
+                      fontWeight: 700,
                       color: "#6B7280",
                       mb: 1,
-                      fontSize: { xs: "0.9rem", sm: "1rem", md: "1.1rem" },
+                      fontSize: { xs: "0.9rem", sm: "1rem", md: "1.3rem" },
                     }}
                   >
                     {stat.title}
@@ -406,8 +577,13 @@ export default function Dashboard() {
                     variant="h5"
                     sx={{
                       fontWeight: 800,
+                      marginTop: "1.8rem",
                       color: "#1F2937",
-                      fontSize: { xs: "1.5rem", sm: "1.7rem", md: "2rem" },
+                      paddingLeft: "10px",
+                      fontSize: { xs: "1.5rem", sm: "1.7rem", md: "3rem" },
+                      width: "100%",
+                      display: "flex",
+                      justifyContent: "flex-end",
                     }}
                   >
                     {stat.value}
@@ -436,180 +612,158 @@ export default function Dashboard() {
               </Paper>
             </Grid>
           ))}
-        </Grid>
+        </Grid> */}
 
-        {/* Action Buttons */}
-        {/* <Box
-          sx={{
-            display: "flex",
-            flexDirection: { xs: "column", sm: "row" },
-            flexWrap: "wrap",
-            gap: { xs: 2, sm: 3 },
-            mb: { xs: 4, md: 6 },
-          }}
-        >
-          <LoadingButton
-            onClick={() => setIsModalOpen(true)}
-            loading={loading}
-            loadingPosition="start"
-            startIcon={<AddIcon />}
-            variant="contained"
-            sx={{
-              textTransform: "none",
-              bgcolor: theme.palette.primary.main,
-              "&:hover": { bgcolor: theme.palette.primary.dark },
-              px: 3,
-              py: { xs: 1, sm: 1.5 },
-              width: { xs: "100%", sm: "auto" },
-            }}
-            aria-label="Create new record"
-          >
-            Create New Record
-          </LoadingButton>
+          <div className=" my-5">
+            <div className="row g-4">
+              {stats.map((stat, index) => (
+                <div
+                  className={`col-12 col-sm-6 col-lg-3 animate__animated ${stat.animation}`}
+                  key={index}
+                >
+                  <Card
+                    className="shadow-lg border-0 h-100 position-relative overflow-hidden"
+                    style={{
+                      borderRadius: "1.2rem",
+                      transition: "transform 0.4s ease, box-shadow 0.4s ease",
+                      cursor: "pointer",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform =
+                        "translateY(-8px) scale(1.05)";
+                      e.currentTarget.style.boxShadow =
+                        "0 15px 35px rgba(0,0,0,0.2)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform =
+                        "translateY(0) scale(1)";
+                      e.currentTarget.style.boxShadow =
+                        "0 6px 15px rgba(0,0,0,0.08)";
+                    }}
+                  >
+                    {/* Animated gradient border */}
+                    {/* <div
+                    className="position-absolute top-0 start-0 w-100 h-100"
+                    style={{
+                      borderRadius: "1.2rem",
+                      padding: "2px",
+                      background:
+                        "linear-gradient(135deg, #6a11cb, #2575fc, #00c6ff)",
+                      WebkitMask:
+                        "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+                      WebkitMaskComposite: "xor",
+                      maskComposite: "exclude",
+                      animation: "gradientBorder 4s ease infinite",
+                    }}
+                  ></div> */}
 
-          {hasSelectedRecords && (
-            <>
-              <Button
-                variant="outlined"
-                startIcon={<EditIcon />}
-                sx={{
-                  textTransform: "none",
-                  borderColor: theme.palette.primary.main,
-                  color: theme.palette.primary.main,
-                  "&:hover": {
-                    borderColor: theme.palette.primary.dark,
-                    bgcolor: alpha(theme.palette.primary.main, 0.04),
-                  },
-                  px: 3,
-                  py: { xs: 1, sm: 1.5 },
-                  width: { xs: "100%", sm: "auto" },
-                }}
-                aria-label="Resume update"
-              >
-                Resume Update
-              </Button>
+                    <Card.Body className="d-flex flex-column align-items-center justify-content-center text-center p-4 position-relative">
+                      <div
+                        className={`bg-${stat.color} bg-opacity-10 d-flex align-items-center justify-content-center mb-3 animate__animated animate__pulse animate__infinite animate__slower rounded-circle`}
+                        style={{ width: 70, height: 70 }}
+                      >
+                        {React.cloneElement(stat.icon, {
+                          className: `text-${stat.color}`,
+                          style: { fontSize: "2rem" },
+                        })}
+                      </div>
+                      <Card.Title
+                        className="fw-semibold text-dark mb-2 animate__animated animate__fadeInDown"
+                        style={{ fontSize: "1.2rem" }}
+                      >
+                        {stat.title}
+                      </Card.Title>
+                      <Card.Text className="fs-2 fw-bold text-dark animate__animated animate__fadeIn animate__slower">
+                        {stat.value}
+                      </Card.Text>
+                    </Card.Body>
+                  </Card>
+                </div>
+              ))}
+            </div>
 
-              <Button
-                variant="outlined"
-                startIcon={<MailIcon />}
-                sx={{
-                  textTransform: "none",
-                  borderColor: theme.palette.secondary.main,
-                  color: theme.palette.secondary.main,
-                  "&:hover": {
-                    borderColor: theme.palette.secondary.dark,
-                    bgcolor: alpha(theme.palette.secondary.main, 0.04),
-                  },
-                  px: 3,
-                  py: { xs: 1, sm: 1.5 },
-                  width: { xs: "100%", sm: "auto" },
-                }}
-                aria-label="Cover letter"
-              >
-                Cover Letter
-              </Button>
+            {/* Gradient border animation */}
+            <style>{`
+        @keyframes gradientBorder {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        .position-absolute[style*="linear-gradient"] {
+          background-size: 300% 300%;
+        }
+      `}</style>
+          </div>
 
-              <Button
-                variant="outlined"
-                startIcon={<QuestionAnswerIcon />}
-                sx={{
-                  textTransform: "none",
-                  borderColor: theme.palette.info.main,
-                  color: theme.palette.info.main,
-                  "&:hover": {
-                    borderColor: theme.palette.info.dark,
-                    bgcolor: alpha(theme.palette.info.main, 0.04),
-                  },
-                  px: 3,
-                  py: { xs: 1, sm: 1.5 },
-                  width: { xs: "100%", sm: "auto" },
-                }}
-                aria-label="Q&A practice"
-              >
-                Q&A Practice
-              </Button>
-
-              <Button
-                variant="outlined"
-                startIcon={<VideocamIcon />}
-                sx={{
-                  textTransform: "none",
-                  borderColor: theme.palette.warning.main,
-                  color: theme.palette.warning.main,
-                  "&:hover": {
-                    borderColor: theme.palette.warning.dark,
-                    bgcolor: alpha(theme.palette.warning.main, 0.04),
-                  },
-                  px: 3,
-                  py: { xs: 1, sm: 1.5 },
-                  width: { xs: "100%", sm: "auto" },
-                }}
-                aria-label="Timed interview"
-              >
-                Timed Interview
-              </Button>
-
-              <Button
-                variant="outlined"
-                startIcon={<DeleteIcon />}
-                sx={{
-                  textTransform: "none",
-                  borderColor: theme.palette.error.main,
-                  color: theme.palette.error.main,
-                  "&:hover": {
-                    borderColor: theme.palette.error.dark,
-                    bgcolor: alpha(theme.palette.error.main, 0.04),
-                  },
-                  px: 3,
-                  py: { xs: 1, sm: 1.5 },
-                  width: { xs: "100%", sm: "auto" },
-                }}
-                aria-label="Delete records"
-              >
-                Delete
-              </Button>
-            </>
-          )}
-        </Box> */}
-
-        {/* Records Table */}
-        <Paper
-          elevation={0}
-          sx={{
-            p: { xs: 2, sm: 3, md: 4 },
-            borderRadius: 3,
-            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.05)",
-            background: "white",
-            overflowX: { xs: "auto", sm: "visible" },
-          }}
-        >
+          {/* Action Buttons */}
           <Box
             sx={{
               display: "flex",
               flexDirection: { xs: "column", sm: "row" },
-              justifyContent: "space-between",
-              alignItems: { xs: "flex-start", sm: "center" },
-              mb: { xs: 2, md: 3 },
-              gap: { xs: 2, sm: 0 },
+              flexWrap: "wrap",
+              gap: { xs: 2, sm: 3 },
+              mb: { xs: 4, md: 6 },
             }}
           >
-            <Typography
-              variant="h6"
+            <LoadingButton
+              onClick={() => setIsModalOpen(true)}
+              loading={loading}
+              loadingPosition="start"
+              startIcon={<AddIcon />}
+              variant="contained"
               sx={{
-                fontWeight: 600,
-                color: "#1F2937",
-                fontSize: { xs: "1.1rem", sm: "1.25rem", md: "1.5rem" },
+                textTransform: "none",
+                bgcolor: theme.palette.primary.main,
+                "&:hover": { bgcolor: theme.palette.primary.dark },
+                px: 3,
+                // py: { xs: 1, sm: 1.5 },
+                width: { xs: "100%", sm: "auto" },
+                fontSize: { xs: "0.9rem", sm: "1rem", md: "1.3rem" },
+                borderRadius: 5,
+              }}
+              aria-label="Create new record"
+            >
+              Create New Record
+            </LoadingButton>
+          </Box>
+
+          {/* Records Table */}
+          <Paper
+            elevation={0}
+            sx={{
+              p: { xs: 2, sm: 3, md: 2 },
+              borderRadius: 3,
+              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.05)",
+              background: "white",
+              overflowX: { xs: "auto", sm: "visible" },
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: { xs: "column", sm: "row" },
+                justifyContent: "space-between",
+                alignItems: { xs: "flex-start", sm: "center" },
+                mb: { xs: 2, md: 3 },
+                gap: { xs: 2, sm: 0 },
               }}
             >
-              Job Application Records
-            </Typography>
-
-            {hasSelectedRecords && (
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: 600,
+                  color: "#1F2937",
+                  fontSize: { xs: "1.1rem", sm: "1.25rem", md: "1.8rem" },
+                }}
+              >
+                Resume Records
+              </Typography>
               <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
                 <Button
                   variant="outlined"
-                  size="small"
+                  size="medium"
                   startIcon={<EditIcon />}
+                  disabled={!hasSelectedRecord}
                   sx={{
                     textTransform: "none",
                     borderColor: theme.palette.primary.main,
@@ -621,13 +775,13 @@ export default function Dashboard() {
                   }}
                   aria-label="Resume update"
                 >
-                  Update
+                  Resume Update
                 </Button>
-
                 <Button
                   variant="outlined"
-                  size="small"
+                  size="medium"
                   startIcon={<MailIcon />}
+                  disabled={!hasSelectedRecord}
                   sx={{
                     textTransform: "none",
                     borderColor: theme.palette.secondary.main,
@@ -641,11 +795,11 @@ export default function Dashboard() {
                 >
                   Cover Letter
                 </Button>
-
                 <Button
                   variant="outlined"
-                  size="small"
+                  size="medium"
                   startIcon={<QuestionAnswerIcon />}
+                  disabled={!hasSelectedRecord}
                   sx={{
                     textTransform: "none",
                     borderColor: theme.palette.info.main,
@@ -659,11 +813,11 @@ export default function Dashboard() {
                 >
                   Q&A
                 </Button>
-
                 <Button
                   variant="outlined"
-                  size="small"
+                  size="medium"
                   startIcon={<VideocamIcon />}
+                  disabled={!hasSelectedRecord}
                   sx={{
                     textTransform: "none",
                     borderColor: theme.palette.warning.main,
@@ -677,11 +831,11 @@ export default function Dashboard() {
                 >
                   Interview
                 </Button>
-
                 <Button
                   variant="outlined"
-                  size="small"
+                  size="medium"
                   startIcon={<DeleteIcon />}
+                  disabled={!hasSelectedRecord}
                   sx={{
                     textTransform: "none",
                     borderColor: theme.palette.error.main,
@@ -696,177 +850,183 @@ export default function Dashboard() {
                   Delete
                 </Button>
               </Box>
-            )}
-          </Box>
-
-          {records.length === 0 ? (
-            <Box sx={{ textAlign: "center", py: { xs: 8, sm: 10, md: 12 } }}>
-              <Box
-                sx={{
-                  mx: "auto",
-                  mb: { xs: 2, md: 3 },
-                  width: 64,
-                  height: 64,
-                  borderRadius: "16px",
-                  bgcolor: alpha(theme.palette.primary.main, 0.1),
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <AddIcon
-                  sx={{ color: theme.palette.primary.main, fontSize: 32 }}
-                />
-              </Box>
-              <Typography
-                sx={{
-                  mb: { xs: 1, md: 2 },
-                  fontWeight: 600,
-                  color: "#1F2937",
-                  fontSize: "1.1rem",
-                }}
-              >
-                No records yet
-              </Typography>
-              <Typography
-                sx={{
-                  mb: { xs: 2, md: 4 },
-                  color: "#6B7280",
-                  maxWidth: 400,
-                  mx: "auto",
-                }}
-              >
-                Get started by creating your first job application record.
-              </Typography>
-              <LoadingButton
-                onClick={() => setIsModalOpen(true)}
-                loading={loading}
-                loadingPosition="start"
-                startIcon={<AddIcon />}
-                variant="contained"
-                sx={{
-                  textTransform: "none",
-                  bgcolor: theme.palette.primary.main,
-                  "&:hover": { bgcolor: theme.palette.primary.dark },
-                  px: 3,
-                  py: { xs: 1, sm: 1.5 },
-                }}
-                aria-label="Create new record"
-              >
-                Create New Record
-              </LoadingButton>
             </Box>
-          ) : (
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell sx={{ width: 50 }}>
-                    <Checkbox
-                      checked={selectedRecords.size === records.length}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setSelectedRecords(new Set(records.map((r) => r.id)));
-                        } else {
-                          setSelectedRecords(new Set());
-                        }
-                      }}
-                      sx={{
-                        "&.Mui-checked": { color: theme.palette.primary.main },
-                        "&:hover": {
-                          bgcolor: alpha(theme.palette.primary.main, 0.04),
-                        },
-                      }}
-                      aria-label="Select all records"
-                    />
-                  </TableCell>
-                  <TableCell>S.No</TableCell>
-                  <TableCell>Resume File Name</TableCell>
-                  <TableCell>Job Title</TableCell>
-                  <TableCell>Company Name</TableCell>
-                  <TableCell>Last Modified</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {records.map((record) => (
-                  <TableRow
-                    key={record.id}
-                    sx={{
-                      "&:hover": {
-                        bgcolor: alpha(theme.palette.primary.main, 0.02),
-                      },
-                      transition: "background-color 0.2s ease",
-                    }}
-                  >
-                    <TableCell>
-                      <Checkbox
-                        checked={selectedRecords.has(record.id)}
-                        onChange={() => toggleRecordSelection(record.id)}
-                        sx={{
-                          "&.Mui-checked": {
-                            color: theme.palette.primary.main,
-                          },
-                          "&:hover": {
-                            bgcolor: alpha(theme.palette.primary.main, 0.04),
-                          },
-                        }}
-                        aria-label={`Select record ${record.serialNumber}`}
-                      />
+            {records.length === 0 ? (
+              <Box sx={{ textAlign: "center", py: { xs: 8, sm: 10, md: 12 } }}>
+                <Box
+                  sx={{
+                    mx: "auto",
+                    mb: { xs: 2, md: 3 },
+                    width: 64,
+                    height: 64,
+                    borderRadius: "16px",
+                    bgcolor: alpha(theme.palette.primary.main, 0.1),
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <AddIcon
+                    sx={{ color: theme.palette.primary.main, fontSize: 32 }}
+                  />
+                </Box>
+                <Typography
+                  sx={{
+                    mb: { xs: 1, md: 2 },
+                    fontWeight: 600,
+                    color: "#1F2937",
+                    fontSize: "1.1rem",
+                  }}
+                >
+                  No records yet
+                </Typography>
+                <Typography
+                  sx={{
+                    mb: { xs: 2, md: 4 },
+                    color: "#6B7280",
+                    maxWidth: 400,
+                    mx: "auto",
+                  }}
+                >
+                  Get started by creating your first job application record.
+                </Typography>
+                <LoadingButton
+                  onClick={() => setIsModalOpen(true)}
+                  loading={loading}
+                  loadingPosition="start"
+                  startIcon={<AddIcon />}
+                  variant="contained"
+                  sx={{
+                    textTransform: "none",
+                    bgcolor: theme.palette.primary.main,
+                    "&:hover": { bgcolor: theme.palette.primary.dark },
+                    px: 3,
+                    py: { xs: 1, sm: 1.5 },
+                  }}
+                  aria-label="Create new record"
+                >
+                  Create New Record
+                </LoadingButton>
+              </Box>
+            ) : (
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell sx={{ width: 50 }}></TableCell>
+                    <TableCell sx={{ fontSize: "1.2rem" }}>S.No</TableCell>
+                    <TableCell sx={{ fontSize: "1.2rem" }}>
+                      Resume File Name
                     </TableCell>
-                    <TableCell
-                      sx={{
-                        fontWeight: 500,
-                        color: "#6B7280",
-                        fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" },
-                      }}
-                    >
-                      {record.serialNumber}
+                    <TableCell sx={{ fontSize: "1.2rem" }}>Job Title</TableCell>
+                    <TableCell sx={{ fontSize: "1.2rem" }}>
+                      Company Name
                     </TableCell>
-                    <TableCell
-                      sx={{
-                        color: theme.palette.primary.main,
-                        fontWeight: 500,
-                        fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" },
-                      }}
-                    >
-                      {record.resumeFileName}
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        color: "#1F2937",
-                        fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" },
-                      }}
-                    >
-                      {record.jobTitle}
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        color: "#1F2937",
-                        fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" },
-                      }}
-                    >
-                      {record.companyName}
-                    </TableCell>
-                    <TableCell
-                      sx={{
-                        color: "#6B7280",
-                        fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" },
-                      }}
-                    >
-                      {record.lastModified.toLocaleDateString()}
+                    <TableCell sx={{ fontSize: "1.2rem" }}>
+                      Last Modified
                     </TableCell>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </Paper>
-
-        <CreateRecordModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          onSave={handleSaveRecord}
-        />
-      </Box>
-    </ThemeProvider>
+                </TableHead>
+                <TableBody>
+                  {records.map((record) => (
+                    <TableRow
+                      key={record.id}
+                      sx={{
+                        "&:hover": {
+                          bgcolor: alpha(theme.palette.primary.main, 0.02),
+                        },
+                        transition: "background-color 0.2s ease",
+                      }}
+                    >
+                      <TableCell>
+                        <Radio
+                          checked={selectedRecord === record.id}
+                          onChange={() => handleRecordSelection(record.id)}
+                          sx={{
+                            "&.Mui-checked": {
+                              color: theme.palette.primary.main,
+                            },
+                            "&:hover": {
+                              bgcolor: alpha(theme.palette.primary.main, 0.04),
+                            },
+                          }}
+                          aria-label={`Select record ${record.serialNumber}`}
+                        />
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          fontWeight: 500,
+                          color: "#6B7280",
+                          fontSize: {
+                            xs: "0.8rem",
+                            sm: "0.9rem",
+                            md: "1.2rem",
+                          },
+                        }}
+                      >
+                        {record.serialNumber}
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          color: theme.palette.primary.main,
+                          fontWeight: 500,
+                          fontSize: {
+                            xs: "0.8rem",
+                            sm: "0.9rem",
+                            md: "1.2rem",
+                          },
+                        }}
+                      >
+                        {record.resumeFileName}
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          color: "#1F2937",
+                          fontSize: {
+                            xs: "0.8rem",
+                            sm: "0.9rem",
+                            md: "1.2rem",
+                          },
+                        }}
+                      >
+                        {record.jobTitle}
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          color: "#1F2937",
+                          fontSize: {
+                            xs: "0.8rem",
+                            sm: "0.9rem",
+                            md: "1.2rem",
+                          },
+                        }}
+                      >
+                        {record.companyName}
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          color: "#6B7280",
+                          fontSize: {
+                            xs: "0.8rem",
+                            sm: "0.9rem",
+                            md: "1.2rem",
+                          },
+                        }}
+                      >
+                        {record.lastModified.toLocaleDateString()}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </Paper>
+          <CreateRecordModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            onSave={handleSaveRecord}
+          />
+        </Box>
+      </ThemeProvider>
+    </>
   );
 }

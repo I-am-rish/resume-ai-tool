@@ -30,8 +30,23 @@ export const menuList = [
   {
     id: 3,
     name: "Q&A",
-    path: "/q-and-a",
+    path: "#",
+    // path: "/q-and-a",
     icon: "feather-message-square",
+    dropdownMenu: [
+      {
+        id: 1,
+        name: "Behavioral",
+        path: "behavioral",
+        subdropdownMenu: false,
+      },
+      {
+        id: 2,
+        name: "Technical",
+        path: "technical",
+        subdropdownMenu: false,
+      },
+    ],
   },
 
   {
@@ -51,5 +66,17 @@ export const menuList = [
     name: "archive",
     path: "/archive",
     icon: "feather-archive",
+  },
+  {
+    id: 5,
+    name: "profile",
+    path: "/profile",
+    icon: "feather-profile",
+  },
+  {
+    id: 5,
+    name: "Logout",
+    path: "/logout",
+    icon: "feather-log-in",
   },
 ];

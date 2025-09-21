@@ -196,7 +196,7 @@ export default function Archive() {
           >
             Archive
           </Typography>
-          <Typography color="text.secondary">
+          <Typography variant="h6" color="text.secondary">
             View all completed activities and their details.
           </Typography>
         </Box>
@@ -211,7 +211,7 @@ export default function Archive() {
       >
         <CardHeader
           title={
-            <Typography variant="h6" fontWeight="bold">
+            <Typography variant="h5" fontWeight="bold">
               Activity History
             </Typography>
           }
@@ -239,6 +239,7 @@ export default function Archive() {
                           minWidth: "auto",
                           justifyContent: "flex-start",
                           textTransform: "none",
+                          fontSize: "1.1rem",
                         }}
                       >
                         S.No.
@@ -255,6 +256,7 @@ export default function Archive() {
                           minWidth: "auto",
                           justifyContent: "flex-start",
                           textTransform: "none",
+                          fontSize: "1.1rem",
                         }}
                       >
                         Activity Type
@@ -271,6 +273,7 @@ export default function Archive() {
                           minWidth: "auto",
                           justifyContent: "flex-start",
                           textTransform: "none",
+                          fontSize: "1.1rem",
                         }}
                       >
                         Resume File Name
@@ -287,6 +290,7 @@ export default function Archive() {
                           minWidth: "auto",
                           justifyContent: "flex-start",
                           textTransform: "none",
+                          fontSize: "1.1rem",
                         }}
                       >
                         Job Title
@@ -303,6 +307,7 @@ export default function Archive() {
                           minWidth: "auto",
                           justifyContent: "flex-start",
                           textTransform: "none",
+                          fontSize: "1.1rem",
                         }}
                       >
                         Completed On
@@ -325,7 +330,7 @@ export default function Archive() {
                       <TableCell>
                         <Chip
                           label={record.activityType}
-                          size="small"
+                          size="medium"
                           sx={{
                             bgcolor: alpha(
                               getActivityColor(record.activityType),
@@ -333,16 +338,25 @@ export default function Archive() {
                             ),
                             color: getActivityColor(record.activityType),
                             fontWeight: 500,
+                            fontSize: "1.1rem",
                           }}
                         />
                       </TableCell>
                       <TableCell
-                        sx={{ fontFamily: "monospace", fontSize: "0.875rem" }}
+                        sx={{ fontFamily: "monospace", fontSize: "1.1rem" }}
                       >
                         {record.resumeFileName}
                       </TableCell>
-                      <TableCell>{record.jobTitle}</TableCell>
-                      <TableCell>{formatDate(record.completedOn)}</TableCell>
+                      <TableCell
+                        sx={{ textTransform: "capitalize", fontSize: "1.1rem" }}
+                      >
+                        {record.jobTitle}
+                      </TableCell>
+                      <TableCell
+                        sx={{ fontWeight: "medium", fontSize: "1.1rem" }}
+                      >
+                        {formatDate(record.completedOn)}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

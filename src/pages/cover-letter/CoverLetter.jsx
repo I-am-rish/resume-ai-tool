@@ -190,7 +190,7 @@ export default function CoverLetter() {
         }}
       >
         <Box sx={{ maxWidth: "1400px", mx: "auto" }}>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2}}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
             <Button
               startIcon={<ArrowBack />}
               onClick={() => navigate("/dashboard")}
@@ -216,27 +216,31 @@ export default function CoverLetter() {
               component="h1"
               fontWeight="bold"
               sx={{
-                background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                // mb: 1,
+                // background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                // WebkitBackgroundClip: "text",
+                // WebkitTextFillColor: "transparent",
+                color: "#077fcf",
               }}
             >
               Cover Letter
             </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+            <Typography variant="h6" color="text.secondary" sx={{ mt: 1 }}>
               Generate and customize cover letters with different styling
-              options.
+              options
             </Typography>
           </Box>
 
           <Box sx={{ display: "grid", gap: 3 }}>
             <AnimatedCard>
               <CardHeader
-                title={<Typography variant="h6">Cover Letter Style</Typography>}
+                title={
+                  <Typography variant="h5" sx={{ fontWeight: "600" }}>
+                    Cover Letter Style
+                  </Typography>
+                }
               />
               <CardContent>
-                <FormControl sx={{ minWidth: { xs: "100%", sm: 300 } }}>
+                <FormControl sx={{ minWidth: { xs: "100%", sm: 170 } }}>
                   <InputLabel id="cover-letter-style-label">
                     Select a style
                   </InputLabel>
@@ -260,7 +264,9 @@ export default function CoverLetter() {
             <AnimatedCard>
               <CardHeader
                 title={
-                  <Typography variant="h6">Generated Cover Letter</Typography>
+                  <Typography variant="h5" sx={{ fontWeight: "600" }}>
+                    Generated Cover Letter
+                  </Typography>
                 }
                 action={
                   <Button
@@ -269,8 +275,9 @@ export default function CoverLetter() {
                     onClick={handleExport}
                     startIcon={<DownloadIcon />}
                     aria-label="Export Cover Letter"
+                    sx={{ fontSize: "1.2rem" }}
                   >
-                    Export
+                    Download
                   </Button>
                 }
               />
@@ -284,7 +291,7 @@ export default function CoverLetter() {
                     borderColor: "divider",
                     whiteSpace: "pre-wrap",
                     fontFamily: '"Roboto", sans-serif',
-                    fontSize: "0.9rem",
+                    fontSize: "1.2rem",
                     lineHeight: 1.6,
                     color: "text.primary",
                   }}
