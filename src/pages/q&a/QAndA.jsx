@@ -26,6 +26,7 @@ import {
   SkipNext as SkipForwardIcon,
   Send as SendIcon,
   RestartAlt as RotateCcwIcon,
+  ArrowBack,
 } from "@mui/icons-material";
 import { keyframes } from "@emotion/react";
 import TechnicalPopup from "./TechnicalPopup";
@@ -356,6 +357,8 @@ export default function QA() {
     <ThemeProvider theme={theme}>
       <Box
         sx={{
+          // marginLeft: "550px",/* Match sidebar width */
+          // width: "calc(100% - 250px)",
           minHeight: "100vh",
           bgcolor: "background.default",
           backgroundImage: `linear-gradient(135deg, ${alpha(
@@ -365,7 +368,7 @@ export default function QA() {
           p: { xs: 2, md: 4 },
         }}
       >
-        <Box sx={{ maxWidth: "80vw", mx: "auto" }}>
+        <Box sx={{ maxWidth: "100vw", mx: "auto" }}>
           {questionType === "behavioral" && (
             <BehavioralPopup
               show={show}
@@ -379,7 +382,10 @@ export default function QA() {
           {questionType === "technical" && (
             <TechnicalPopup
               show={show}
-              onClose={() => setSessionState("setup")}
+              onClose={() => {
+                setSessionState("setup");
+                setShow(false);
+              }}
               onStart={startPractice}
             />
           )}
@@ -389,11 +395,37 @@ export default function QA() {
             sessionState === "reviewing") &&
             currentQuestion && (
               <Box sx={{ display: "grid", gap: 3 }}>
+                <Box
+                  sx={{ display: "flex", alignItems: "center", gap: 2,mt:1 }}
+                >
+                  <Button
+                    startIcon={<ArrowBack />}
+                    onClick={() => navigate("/dashboard")}
+                    variant="outlined"
+                    sx={{
+                      mb: 2,
+                      borderRadius: 2,
+                      px: 3,
+                      py: 1,
+                      backdropFilter: "blur(10px)",
+                      backgroundColor: alpha(
+                        theme.palette.background.paper,
+                        0.7
+                      ),
+                      "&:hover": {
+                        backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                      },
+                    }}
+                    aria-label="Back to Dashboard"
+                  >
+                    Back to Dashboard
+                  </Button>
+                </Box>
                 <AnimatedCard>
                   <CardHeader
                     title={
                       <Typography variant="h5" sx={{ fontWeight: "600" }}>
-                        Current Question
+                         Question
                       </Typography>
                     }
                     action={
@@ -581,9 +613,7 @@ export default function QA() {
           {sessionState === "feedback" && feedback && (
             <AnimatedCard>
               <CardHeader
-                title={
-                  <Typography variant="h6">Performance Feedback</Typography>
-                }
+                title={<Typography variant="h6">Feedback</Typography>}
               />
               <CardContent sx={{ display: "grid", gap: 3 }}>
                 <Box

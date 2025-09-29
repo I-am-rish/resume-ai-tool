@@ -653,6 +653,7 @@ import {
   ArrowBack,
 } from "@mui/icons-material";
 import { keyframes } from "@emotion/react";
+import httpClient from "@/utils/httpClinet";
 
 // Enhanced MUI Theme with meaningful colors
 const theme = createTheme({
@@ -910,6 +911,17 @@ export default function Resume() {
   const handleUpdateResume = () => {
     setChangesSaved(false);
     setShowReviewDialog(true);
+  };
+
+  const apiRequest = async () => {
+    httpClient
+      .post(`/analysis-resume`)
+      .then((res) => {
+        console.log("resume api res => ", res);
+      })
+      .catch((err) => {
+        console.log("resume api err => ", err);
+      });
   };
 
   const handleSaveChanges = () => {

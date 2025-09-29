@@ -224,9 +224,9 @@ export default function Interview() {
     }
 
     // Filter by experience level
-    filteredQuestions = filteredQuestions.filter(
-      (q) => q.level === experienceLevel
-    );
+    // filteredQuestions = filteredQuestions.filter(
+    //   (q) => q.level === experienceLevel
+    // );
 
     // If not enough questions, add from other levels
     if (filteredQuestions.length < numQuestions) {
@@ -510,7 +510,7 @@ export default function Interview() {
               </Select>
             </FormControl>
 
-            <FormControl fullWidth>
+            {/* <FormControl fullWidth>
               <InputLabel id="experience-label">Experience Level</InputLabel>
               <Select
                 labelId="experience-label"
@@ -522,7 +522,7 @@ export default function Interview() {
                 <MenuItem value="mid">Mid Level</MenuItem>
                 <MenuItem value="senior">Senior Level</MenuItem>
               </Select>
-            </FormControl>
+            </FormControl> */}
 
             <Button
               variant="contained"

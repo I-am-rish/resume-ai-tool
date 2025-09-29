@@ -156,7 +156,7 @@ const ProfileModal = () => {
           onClick={() => {
             // navigate("/authentication/login");
             localStorage.clear();
-            window.location.reload();
+            window.location.href = "/";
           }}
         >
           <i>

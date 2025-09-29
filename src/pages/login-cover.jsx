@@ -10,12 +10,14 @@ import {
   CardContent,
   IconButton,
   useMediaQuery,
+  CircularProgress,
 } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
 import httpClient from "@/utils/httpClinet";
-import {useSnackbar} from "notistack"
+import { useSnackbar } from "notistack";
+import GoogleIcon from "@mui/icons-material/Google";
 
 const StyledCard = styled(Card)(({ theme }) => ({
   borderRadius: 16,
@@ -171,45 +173,58 @@ const AuthComponent = () => {
     password: "",
     confirmPassword: "",
   });
+  const [loading, setLoading] = useState(false); // New loading state
 
-  const {enqueueSnackbar} = useSnackbar();
+  const { enqueueSnackbar } = useSnackbar();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // if (isSignup && formData.password !== formData.confirmPassword) {
-    //   alert("Passwords do not match!");
-    //   return;
-    // }
-    console.log("Form submitted:", { ...formData, isSignup });
-    // Add your authentication logic here
-    if (isSignup) {
-       httpClient
-         .post("/sign-up", formData)
-         .then((res) => {
-           console.log("auth res => ", res);
-         })
-         .catch((err) => {
-           console.log("err => ", err.response.data.message);
-           enqueueSnackbar(err.response.data.message, { variant: "error" });
-         });
-     }else{
-       httpClient
-         .post("/login", {email: formData?.email, password: formData?.password})
-         .then((res) => {
-           console.log("auth login res => ", res);
-         })
-         .catch((err) => {
-           console.log("err => ", err.response.data.message);
-           enqueueSnackbar(err.response.data.message, { variant: "error" });
-         });
-     }
+    if (isSignup && formData.password !== formData.confirmPassword) {
+      enqueueSnackbar("Passwords do not match!", { variant: "error" });
+      return;
+    }
+
+    setLoading(true); // Set loading to true when submission starts
+
+    try {
+      if (isSignup) {
+        const res = await httpClient.post("/sign-up", formData);
+        localStorage.setItem("token", JSON.stringify(res.data.data.token));
+        // localStorage.setItem("user", JSON.stringify(res.data.data.user));
+        enqueueSnackbar("Registration success", { variant: "success" });
+        window.location.href = "/authentication/login";
+      } else {
+        const res = await httpClient.post("/login", {
+          email: formData.email,
+          password: formData.password,
+        });
+        localStorage.setItem("token", JSON.stringify(res.data.data.token));
+        // localStorage.setItem("user", JSON.stringify(res.data.data.user));
+        enqueueSnackbar("Login successfully!", { variant: "success" });
+        window.location.href = "/dashboard";
+      }
+    } catch (err) {
+      const errorMessage = err.response?.data?.message || "An error occurred";
+      enqueueSnackbar(errorMessage, { variant: "error" });
+    } finally {
+      setLoading(false); // Reset loading state when request completes
+    }
   };
 
   const toggleAuthMode = () => setIsSignup(!isSignup);
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const type = urlParams.get("type");
+    console.log("type => ", type);
+    if (type === "register") {
+      setIsSignup(true);
+    }
+  }, [])
 
   const variants = {
     initial: { opacity: 0, y: 30, scale: 0.95 },
@@ -265,8 +280,8 @@ const AuthComponent = () => {
           left: 0,
           width: "100%",
           height: "100%",
-          background:
-            "linear-gradient(135deg, #0A0F1A 0%, #1A1F2E 50%, #2A2F3E 100%)",
+          // background:
+          //   "linear-gradient(135deg, #0A0F1A 0%, #1A1F2E 50%, #2A2F3E 100%)",
           zIndex: 0,
           overflow: "hidden",
         }}
@@ -332,9 +347,34 @@ const AuthComponent = () => {
               color="text.secondary"
               sx={{ maxWidth: 300, mx: "auto", mt: 1 }}
             >
-              {isSignup
-                ? "Start your career transformation journey with CareerAI!"
-                : "Welcome back, Sign in to your CareerAI account!"}
+              {isSignup ? (
+                <>
+                  <Typography
+                    variant="body1"
+                    color="text.secondary"
+                    sx={{ maxWidth: 300, mx: "auto", mt: 1 }}
+                  >
+                    Start your journey to be job ready!
+                  </Typography>
+                </>
+              ) : (
+                <>
+                  <Typography
+                    variant="body1"
+                    color="text.secondary"
+                    sx={{ maxWidth: 300, mx: "auto", mt: 1 }}
+                  >
+                    Welcome back
+                  </Typography>
+                  <Typography
+                    variant="body1"
+                    color="text.secondary"
+                    sx={{ maxWidth: 300, mx: "auto", mt: 1 }}
+                  >
+                    Sign in to your CareerAI account!
+                  </Typography>
+                </>
+              )}
             </Typography>
           </Box>
 
@@ -345,8 +385,8 @@ const AuthComponent = () => {
               initial="initial"
               animate="animate"
               exit="exit"
-              onSubmit={handleSubmit} // ← Fixed: Pass the handler function directly
-              sx={{ display: "flex", flexDirection: "column", gap: 5 }} // Increased gap to 5 for input fields
+              onSubmit={handleSubmit}
+              sx={{ display: "flex", flexDirection: "column", gap: 5 }}
             >
               {isSignup && (
                 <EnhancedTextField
@@ -429,13 +469,12 @@ const AuthComponent = () => {
                 whileTap="tap"
                 sx={{ mt: 5 }}
               >
-                {" "}
-                {/* Increased margin-top to 5 */}
                 <Button
                   type="submit"
                   variant="contained"
                   size="large"
                   fullWidth
+                  disabled={loading} // Disable button during loading
                   sx={{
                     background: "linear-gradient(135deg, #00C4FF, #A855F7)",
                     color: "#fff",
@@ -443,90 +482,78 @@ const AuthComponent = () => {
                     padding: "12px",
                     borderRadius: 2,
                     fontWeight: 600,
+                    fontSize: 20,
                     "&:hover": {
                       background: "linear-gradient(135deg, #0099CC, #9333EA)",
                       boxShadow: "0 4px 12px rgba(0, 196, 255, 0.4)",
                     },
+                    "&:disabled": {
+                      background: "linear-gradient(135deg, #cccccc, #aaaaaa)",
+                      cursor: "not-allowed",
+                    },
                   }}
                 >
-                  {isSignup ? "Create Account" : "Sign In"}
+                  {loading ? (
+                    <CircularProgress size={24} color="inherit" />
+                  ) : isSignup ? (
+                    "Create Account"
+                  ) : (
+                    "Sign In"
+                  )}
                 </Button>
               </motion.div>
               <Box sx={{ textAlign: "center", mt: 5 }}>
-                {" "}
-                {/* Increased margin-top to 5 */}
                 <Typography
-                  variant="body2"
+                  variant="body1"
                   color="text.secondary"
                   sx={{ mb: 2 }}
                 >
                   OR CONTINUE WITH
                 </Typography>
-                <Grid
-                  // container
-                  spacing={3}
-                  justifyContent="center"
-                >
-                  {" "}
-                  {/* Increased spacing to 3 */}
+                <Grid spacing={3} justifyContent="center">
                   <Grid item>
                     <Button
                       variant="outlined"
                       fullWidth
-                      startIcon={
-                        <Box component="span" className="text-red-500 text-xl">
-                          G
-                        </Box>
-                      }
+                      // startIcon={
+                        
+                      //     <GoogleIcon sx={{ color: "blue" }} />
+                      // }
                       sx={{
                         borderColor: alpha(theme.palette.grey[400], 0.5),
                         width: "80%",
-                        color: "text.primary",
+                        // color: "text.primary",
+                        fontWeight: 700,
+                        color: "blue",
                         borderRadius: 2,
                         padding: "6px 16px",
+                        fontSize: 20,
                         "&:hover": {
                           borderColor: theme.palette.primary.main,
-                          color: theme.palette.primary.main,
+                          color: "#ffff",
+                          background:"blue"
+
+                          //   "linear-gradient(135deg, #4752eb, #bf86f5)",
+                          // boxShadow: "0 4px 12px rgba(0, 196, 255, 0.4)",
                         },
                       }}
                     >
                       Google
                     </Button>
                   </Grid>
-                  {/* <Grid item>
-                    <Button
-                      variant="outlined"
-                      startIcon={
-                        <Box component="span" className="text-blue-600 text-xl">
-                          f
-                        </Box>
-                      }
-                      sx={{
-                        borderColor: alpha(theme.palette.grey[400], 0.5),
-                        color: "text.primary",
-                        borderRadius: 2,
-                        padding: "6px 16px",
-                        "&:hover": {
-                          borderColor: theme.palette.primary.main,
-                          color: theme.palette.primary.main,
-                        },
-                      }}
-                    >
-                      Facebook
-                    </Button>
-                  </Grid> */}
                 </Grid>
               </Box>
               <Typography
-                variant="body2"
+                // variant="body1"
                 color="primary"
                 sx={{
                   textAlign: "center",
-                  mt: 5, // Increased margin-top to 5
+                  mt: 5,
                   cursor: "pointer",
+                  fontSize: 18,
                   "&:hover": { textDecoration: "underline", color: "#A855F7" },
                 }}
-                onClick={() => toggleAuthMode()}
+                onClick={toggleAuthMode}
               >
                 {isSignup
                   ? "Already have an account? Sign in"

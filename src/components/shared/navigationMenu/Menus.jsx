@@ -388,7 +388,7 @@ const Menus = () => {
                                   sx={{
                                     borderRadius: 1.5,
                                     py: 0.8,
-                                    px: 2,
+                                    px: 4,
                                     mb: 0.3,
                                     bgcolor: isChildActive
                                       ? alpha(color, 0.08)
@@ -407,7 +407,7 @@ const Menus = () => {
                                       <Typography
                                         variant="body1"
                                         fontWeight={isChildActive ? 600 : 500}
-                                        sx={{ textTransform: "capitalize" }}
+                                        sx={{ textTransform: "capitalize", fontSize: 20 }}
                                       >
                                         {name}
                                       </Typography>

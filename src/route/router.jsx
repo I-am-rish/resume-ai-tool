@@ -46,25 +46,25 @@ const routes = [
       {
         path: "/dashboard",
         element: (
-          // <ProtectedRoute>
+          <ProtectedRoute>
           <Dashboard />
-          // </ProtectedRoute>
+           </ProtectedRoute>
         ),
       },
       {
         path: "/resume",
         element: (
-          // <ProtectedRoute>
+          <ProtectedRoute>
           <Resume />
-          // </ProtectedRoute>
+           </ProtectedRoute>
         ),
       },
       {
         path: "/cover-letter",
         element: (
-          // <ProtectedRoute>
+          <ProtectedRoute>
           <CoverLetter />
-          // </ProtectedRoute>
+          </ProtectedRoute>
         ),
       },
       // {
@@ -78,57 +78,57 @@ const routes = [
       {
         path: "/behavioral",
         element: (
-          // <ProtectedRoute>
+          <ProtectedRoute>
           <QAndA />
-          // </ProtectedRoute>
+          </ProtectedRoute>
         ),
       },
       {
         path: "/technical",
         element: (
-          // <ProtectedRoute>
+          <ProtectedRoute>
           <QAndA />
-          // </ProtectedRoute>
+          </ProtectedRoute>
         ),
       },
       {
         path: "/interview",
         element: (
-          // <ProtectedRoute>
+          <ProtectedRoute>
           <Interview />
-          // </ProtectedRoute>
+          </ProtectedRoute>
         ),
       },
       {
         path: "/analytics",
         element: (
-          // <ProtectedRoute>
+          <ProtectedRoute>
           <Analytics />
-          // </ProtectedRoute>
+          </ProtectedRoute>
         ),
       },
       {
         path: "/archive",
         element: (
-          // <ProtectedRoute>
+          <ProtectedRoute>
           <Archive />
-          // </ProtectedRoute>
+          </ProtectedRoute>
         ),
       },
       {
         path: "/profile",
         element: (
-          // <ProtectedRoute>
+          <ProtectedRoute>
           <Profile />
-          // </ProtectedRoute>
+          </ProtectedRoute>
         ),
       },
       {
         path: "/logout",
         element: (
-          // <ProtectedRoute>
+          <ProtectedRoute>
           <Logout />
-          // </ProtectedRoute>
+          </ProtectedRoute>
         ),
       },
     ],

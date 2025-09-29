@@ -113,7 +113,7 @@ const Navbar = () => {
                   boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
                 },
               }}
-              onClick={() => navigate("/authentication/login")}
+              onClick={() => navigate("/authentication/login?type=login")}
             >
               Sign In
             </Button>
@@ -136,7 +136,7 @@ const Navbar = () => {
                     transform: "translateY(-2px)",
                   },
                 }}
-                // onClick={() => navigate("/authentication/login")}
+                onClick={() => navigate("/authentication/login?type=register")}
               >
                 Get Started
               </Button>
@@ -252,7 +252,7 @@ const Navbar = () => {
                     transform: "translateY(-2px)",
                   },
                 }}
-                // onClick={() => navigate("/authentication/login")}
+                onClick={() => navigate("/authentication/login?type=register")}
               >
                 Get Started
               </Button>

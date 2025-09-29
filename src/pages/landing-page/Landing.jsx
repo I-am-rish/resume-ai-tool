@@ -1264,8 +1264,7 @@ const CareerLanding = () => {
             }}
           >
             Transform your resume, practice interviews, and get personalized
-            insights with our AI-powered career platform. Join thousands who've
-            accelerated their career success.
+            insights with our AI-powered career platform.
           </Typography>
           <Stack
             direction={{ xs: "column", sm: "row" }}
@@ -1291,7 +1290,7 @@ const CareerLanding = () => {
                     boxShadow: "0 6px 20px rgba(79, 70, 229, 0.4)",
                   },
                 }}
-                onClick={() => navigate("/authentication/login")}
+                onClick={() => navigate("/authentication/login?type=register")}
               >
                 Start Free Today
               </Button>
@@ -1492,7 +1491,7 @@ const CareerLanding = () => {
               Ready to Accelerate Your Career?
             </Typography>
           </motion.div>
-          <Typography
+          {/* <Typography
             variant="h6"
             sx={{
               maxWidth: 700,
@@ -1504,7 +1503,7 @@ const CareerLanding = () => {
           >
             Join thousands of professionals who've transformed their job search
             with AI
-          </Typography>
+          </Typography> */}
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Button
               variant="contained"
@@ -1519,7 +1518,7 @@ const CareerLanding = () => {
                   boxShadow: "0 6px 20px rgba(79, 70, 229, 0.4)",
                 },
               }}
-              onClick={() => navigate("/authentication/login")}
+              onClick={() => navigate("/authentication/login?type=register")}
             >
               Start Your Success Story
             </Button>
