@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -58,6 +58,7 @@ const CreateRecordModal = ({ isOpen, onClose, onSave }) => {
   });
   const [loading, setLoading] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
+  const navigate = useNavigate();
 
   const handleTextChange = (e) => {
     const { name, value } = e.target;
@@ -79,9 +80,11 @@ const CreateRecordModal = ({ isOpen, onClose, onSave }) => {
       if (!value.trim()) {
         newErrors.jobDescription = "Job Description is required";
       } else if (value.length < 10) {
-        newErrors.jobDescription = "Job Description must be at least 10 characters";
-      } else if (value.length > 1000) {
-        newErrors.jobDescription = "Job Description cannot exceed 1000 characters";
+        newErrors.jobDescription =
+          "Job Description must be at least 10 characters";
+      } else if (value.length > 2500) {
+        newErrors.jobDescription =
+          "Job Description cannot exceed 1000 characters";
       } else {
         newErrors.jobDescription = "";
       }
@@ -126,10 +129,12 @@ const CreateRecordModal = ({ isOpen, onClose, onSave }) => {
       newErrors.jobDescription = "Job Description is required";
       isValid = false;
     } else if (formData.jobDescription.length < 10) {
-      newErrors.jobDescription = "Job Description must be at least 10 characters";
+      newErrors.jobDescription =
+        "Job Description must be at least 10 characters";
       isValid = false;
-    } else if (formData.jobDescription.length > 1000) {
-      newErrors.jobDescription = "Job Description cannot exceed 1000 characters";
+    } else if (formData.jobDescription.length > 2500) {
+      newErrors.jobDescription =
+        "Job Description cannot exceed 1000 characters";
       isValid = false;
     }
 
@@ -150,7 +155,9 @@ const CreateRecordModal = ({ isOpen, onClose, onSave }) => {
 
   const handleSubmit = () => {
     if (!validateForm()) {
-      enqueueSnackbar("Please fix the errors in the form", { variant: "error" });
+      enqueueSnackbar("Please fix the errors in the form", {
+        variant: "error",
+      });
       return;
     }
 
@@ -158,8 +165,6 @@ const CreateRecordModal = ({ isOpen, onClose, onSave }) => {
     setTimeout(() => {
       apiRequest(formData);
       onSave(formData);
-     
-      
     }, 1000); // Simulate API delay
   };
 
@@ -170,21 +175,25 @@ const CreateRecordModal = ({ isOpen, onClose, onSave }) => {
     formDataToSend.append("jobDescription", data.jobDescription);
 
     httpClient
-      .post(`/analysis-resume`, formDataToSend)
+      .post(`/upload-resume`, formDataToSend)
       .then((res) => {
-        console.log("resume api res => ", res.data); 
-        enqueueSnackbar("Resume analysis successfully", { variant: "success" });
-        
+        console.log("upload resume api res => ", res.data);
+        enqueueSnackbar("Resume uploaded successfully", { variant: "success" });
+        navigate("/resume", { state: { data: res.data?.data } });
       })
       .catch((err) => {
-        console.log("resume api err => ", err);
-        enqueueSnackbar( err.response?.data?.message ||"Resume analysis failed", { variant: "error" });
-      }).finally(() => {
-        setLoading(false);
-         onClose();
-         setFormData({ resumeFile: null, jobTitle: "", jobDescription: "" });
-         setErrors({ jobTitle: "", jobDescription: "", resumeFile: "" });
+        console.log("upload resume api err => ", err);
+        enqueueSnackbar(
+          err.response?.data?.message || "Resume analysis failed",
+          { variant: "error" }
+        );
       })
+      .finally(() => {
+        setLoading(false);
+        onClose();
+        setFormData({ resumeFile: null, jobTitle: "", jobDescription: "" });
+        setErrors({ jobTitle: "", jobDescription: "", resumeFile: "" });
+      });
   };
 
   return (
@@ -239,7 +248,14 @@ const CreateRecordModal = ({ isOpen, onClose, onSave }) => {
               Upload Resume
             </Typography>
 
-            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 2,
+              }}
+            >
               <Button
                 variant="outlined"
                 component="label"
@@ -273,6 +289,11 @@ const CreateRecordModal = ({ isOpen, onClose, onSave }) => {
               >
                 (.pdf, .doc, .docx)
               </Typography>
+              {formData.resumeFile && !errors.resumeFile && (
+                <Typography variant="body1" sx={{ color: "#4F46E5" }}>
+                  Selected file: {formData.resumeFile.name}
+                </Typography>
+              )}
             </Box>
 
             {/* Acceptable file types */}
@@ -354,11 +375,6 @@ const CreateRecordModal = ({ isOpen, onClose, onSave }) => {
             )}
 
             {/* Selected file display */}
-            {formData.resumeFile && !errors.resumeFile && (
-              <Typography variant="body2" sx={{ color: "#6B7280", mt: 1 }}>
-                Selected file: {formData.resumeFile.name}
-              </Typography>
-            )}
           </Box>
         </Box>
       </DialogContent>
@@ -402,22 +418,22 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [records, setRecords] = useState([
-    {
-      id: "1",
-      serialNumber: 1,
-      resumeFileName: "john_doe_resume_v2.pdf",
-      jobTitle: "Senior Frontend Developer",
-      companyName: "TechCorp Inc",
-      lastModified: new Date("2024-01-15"),
-    },
-    {
-      id: "2",
-      serialNumber: 2,
-      resumeFileName: "john_doe_resume_design.pdf",
-      jobTitle: "Product Designer",
-      companyName: "Design Studio",
-      lastModified: new Date("2024-01-10"),
-    },
+    // {
+    //   id: "1",
+    //   serialNumber: 1,
+    //   resumeFileName: "john_doe_resume_v2.pdf",
+    //   jobTitle: "Senior Frontend Developer",
+    //   companyName: "TechCorp Inc",
+    //   lastModified: new Date("2024-01-15"),
+    // },
+    // {
+    //   id: "2",
+    //   serialNumber: 2,
+    //   resumeFileName: "john_doe_resume_design.pdf",
+    //   jobTitle: "Product Designer",
+    //   companyName: "Design Studio",
+    //   lastModified: new Date("2024-01-10"),
+    // },
   ]);
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -510,6 +526,18 @@ export default function Dashboard() {
       },
     },
   });
+
+  useEffect(() => {
+    httpClient
+      .get(`get-all-upload-resumes`)
+      .then((res) => {
+        console.log(res.data.data);
+        setRecords(res.data.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
 
   return (
     <>
@@ -657,7 +685,7 @@ export default function Dashboard() {
               <Typography
                 color="primary"
                 className="animate__animated animate__fadeInUp fs-5 fw-bold me-2"
-                sx={{ textDecoration: "underline", cursor: "pointer"}}
+                sx={{ textDecoration: "underline", cursor: "pointer" }}
                 onClick={() => navigate("/analytics")}
               >
                 View Analytics
@@ -857,7 +885,7 @@ export default function Dashboard() {
                     </TableCell>
                     <TableCell sx={{ fontSize: "1.2rem" }}>Job Title</TableCell>
                     <TableCell sx={{ fontSize: "1.2rem" }}>
-                      Company Name
+                      Job Description
                     </TableCell>
                     <TableCell sx={{ fontSize: "1.2rem" }}>
                       Last Modified
@@ -865,9 +893,9 @@ export default function Dashboard() {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {records.map((record) => (
+                  {records.map((record, index) => (
                     <TableRow
-                      key={record.id}
+                      key={record._id}
                       sx={{
                         "&:hover": {
                           bgcolor: alpha(theme.palette.primary.main, 0.02),
@@ -877,8 +905,8 @@ export default function Dashboard() {
                     >
                       <TableCell>
                         <Radio
-                          checked={selectedRecord === record.id}
-                          onChange={() => handleRecordSelection(record.id)}
+                          checked={selectedRecord === record._id}
+                          onChange={() => handleRecordSelection(record._id)}
                           sx={{
                             "&.Mui-checked": {
                               color: theme.palette.primary.main,
@@ -887,7 +915,7 @@ export default function Dashboard() {
                               bgcolor: alpha(theme.palette.primary.main, 0.04),
                             },
                           }}
-                          aria-label={`Select record ${record.serialNumber}`}
+                          aria-label={`Select record ${index + 1}`}
                         />
                       </TableCell>
                       <TableCell
@@ -901,7 +929,7 @@ export default function Dashboard() {
                           },
                         }}
                       >
-                        {record.serialNumber}
+                        {index + 1}
                       </TableCell>
                       <TableCell
                         sx={{
@@ -914,7 +942,7 @@ export default function Dashboard() {
                           },
                         }}
                       >
-                        {record.resumeFileName}
+                        {record.resumeFile}
                       </TableCell>
                       <TableCell
                         sx={{
@@ -938,7 +966,7 @@ export default function Dashboard() {
                           },
                         }}
                       >
-                        {record.companyName}
+                        {record.jobDescription}
                       </TableCell>
                       <TableCell
                         sx={{
@@ -950,7 +978,7 @@ export default function Dashboard() {
                           },
                         }}
                       >
-                        {record.lastModified.toLocaleDateString()}
+                        {record?.updatedAt?.substring(0, 10)}
                       </TableCell>
                     </TableRow>
                   ))}

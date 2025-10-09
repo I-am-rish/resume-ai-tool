@@ -18,6 +18,7 @@ import {
   createTheme,
   ThemeProvider,
   alpha,
+  CircularProgress,
 } from "@mui/material";
 import {
   ArrowBack as ArrowLeftIcon,
@@ -32,6 +33,7 @@ import { keyframes } from "@emotion/react";
 import TechnicalPopup from "./TechnicalPopup";
 import BehavioralPopup from "./BehavioralPopup";
 import { useSnackbar } from "notistack";
+import httpClient from "@/utils/httpClinet";
 
 // Custom MUI Theme
 const theme = createTheme({
@@ -101,20 +103,18 @@ const theme = createTheme({
   },
 });
 
-// Keyframe for fade-in animation
+// Keyframe animations
 const fadeIn = keyframes`
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 `;
 
-// Keyframe for pulse animation
 const pulse = keyframes`
   0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(20, 184, 166, 0.7); }
   50% { transform: scale(1.5); box-shadow: 0 0 0 8px rgba(20, 184, 166, 0); }
   100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(20, 184, 166, 0); }
 `;
 
-// Styled components
 const AnimatedCard = styled(Card)(({ theme }) => ({
   animation: `${fadeIn} 0.5s ease-out`,
 }));
@@ -170,19 +170,49 @@ export default function QA() {
   const [interimTranscript, setInterimTranscript] = useState("");
   const [feedback, setFeedback] = useState(null);
   const [show, setShow] = useState(true);
-
-  // Speech recognition setup
+  const [questions, setQuestions] = useState([]);
   const [recognition, setRecognition] = useState(null);
+  const [loading, setLoading] = useState(false); // ✅ loader state
+  const [currentKeyIndex, setCurrentKeyIndex] = useState(0);
+
+  const questionKeys = ["Q1", "Q2", "Q3"];
 
   useEffect(() => {
-    // Initialize SpeechRecognition
+    let type = "";
+    if (questionType === "behavioral") {
+      type = "Behavioral";
+    } else if (questionType === "technical") {
+      type = "Technical";
+    } else {
+      return;
+    }
+
+    setLoading(true);
+    httpClient
+      .get(`/qnaQuestion/68e010029199f38a9ae080ed/${type}`)
+      .then((res) => {
+        console.log("res", res.data.data);
+        setQuestions(res.data.data);
+      })
+      .catch((err) => {
+        console.log("err", err);
+        enqueueSnackbar("Failed to fetch questions", { variant: "error" });
+      })
+      .finally(() => setLoading(false));
+  }, [questionType]);
+
+  // console.log("questions", questions["Q1"]);
+  // console.log("currentQuestion", currentQuestion);
+  // console.log("sessionState", sessionState);
+
+  useEffect(() => {
     const SpeechRecognition =
       window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
       const recog = new SpeechRecognition();
-      recog.continuous = true; // Keep listening until stopped
-      recog.interimResults = true; // Show interim results for real-time transcription
-      recog.lang = "en-US"; // Set language to English
+      recog.continuous = true;
+      recog.interimResults = true;
+      recog.lang = "en-US";
       setRecognition(recog);
     } else {
       enqueueSnackbar("Speech recognition not supported in your browser.", {
@@ -191,29 +221,25 @@ export default function QA() {
     }
   }, [enqueueSnackbar]);
 
-  // Set question type based on URL path
   useEffect(() => {
     setQuestionType(window.location.pathname.substring(1));
     setShow(true);
   }, [window.location.pathname]);
 
-  // Read question aloud when sessionState changes to "question"
   useEffect(() => {
     if (sessionState === "question" && currentQuestion) {
       readQuestionAloud(currentQuestion.text);
     }
   }, [sessionState, currentQuestion]);
 
-  const getRandomQuestion = (type, level) => {
-    const filteredQuestions = mockQuestions.filter((q) => q.type === type);
-    return filteredQuestions[
-      Math.floor(Math.random() * filteredQuestions.length)
-    ];
+  const getRandomQuestion = () => {
+    const randIndex = Math.floor(Math.random() * questionKeys.length);
+    return { index: randIndex, text: questions[questionKeys[randIndex]] };
   };
 
   const startPractice = () => {
-    const question = getRandomQuestion(questionType, difficulty);
-    setCurrentQuestion(question);
+    setCurrentKeyIndex(0);
+    setCurrentQuestion({ text: questions[questionKeys[0]] });
     setSessionState("question");
     setFinalTranscript("");
     setInterimTranscript("");
@@ -221,27 +247,28 @@ export default function QA() {
     setShow(false);
   };
 
+  // console.log("questions", questions);
+  // console.log("currentQuestion", currentQuestion);
+
   const skipQuestion = () => {
-    const question = getRandomQuestion(questionType, difficulty);
-    setCurrentQuestion(question);
+    const nextIndex = (currentKeyIndex + 1) % questionKeys.length;
+    setCurrentKeyIndex(nextIndex);
+    setCurrentQuestion({ text: questions[questionKeys[nextIndex]] });
   };
 
   const startRecording = () => {
     if (recognition) {
       setIsRecording(true);
       setSessionState("recording");
-      setFinalTranscript(""); // Clear previous final transcript
-      setInterimTranscript(""); // Clear previous interim transcript
-
-      // Set up event handlers
+      setFinalTranscript("");
+      setInterimTranscript("");
       recognition.onresult = (event) => {
         let interim = "";
         for (let i = event.resultIndex; i < event.results.length; i++) {
           const transcriptPart = event.results[i][0].transcript;
           if (event.results[i].isFinal) {
-            // Append only new final transcript to avoid duplicates
             setFinalTranscript((prev) => prev + transcriptPart + " ");
-            setInterimTranscript(""); // Clear interim when final is received
+            setInterimTranscript("");
           } else {
             interim = transcriptPart;
           }
@@ -260,7 +287,7 @@ export default function QA() {
       recognition.onend = () => {
         if (isRecording) {
           try {
-            recognition.start(); // Restart recognition if still recording
+            recognition.start();
           } catch (error) {
             enqueueSnackbar("Failed to restart recording.", {
               variant: "error",
@@ -276,9 +303,7 @@ export default function QA() {
       } catch (error) {
         enqueueSnackbar(
           "Failed to start recording. Please check microphone permissions.",
-          {
-            variant: "error",
-          }
+          { variant: "error" }
         );
         setIsRecording(false);
         setSessionState("question");
@@ -293,13 +318,13 @@ export default function QA() {
   const stopRecording = () => {
     if (recognition) {
       recognition.stop();
-      recognition.onresult = null; // Clear onresult handler
-      recognition.onerror = null; // Clear onerror handler
-      recognition.onend = null; // Clear onend handler to prevent restarts
+      recognition.onresult = null;
+      recognition.onerror = null;
+      recognition.onend = null;
     }
     setIsRecording(false);
     setSessionState("reviewing");
-    setInterimTranscript(""); // Clear interim transcript on stop
+    setInterimTranscript("");
   };
 
   const submitResponse = () => {
@@ -318,9 +343,10 @@ export default function QA() {
   };
 
   const practiceAnother = () => {
+    const randQ = getRandomQuestion();
+    setCurrentKeyIndex(randQ.index);
+    setCurrentQuestion({ text: randQ.text });
     setSessionState("question");
-    const question = getRandomQuestion(questionType);
-    setCurrentQuestion(question);
     setFinalTranscript("");
     setInterimTranscript("");
     setFeedback(null);
@@ -340,25 +366,10 @@ export default function QA() {
     }
   };
 
-  const getDifficultyColor = (level) => {
-    switch (level) {
-      case "easy":
-        return { bgcolor: "success.light", color: "success.main" };
-      case "medium":
-        return { bgcolor: "#fef3c7", color: "#d97706" };
-      case "hard":
-        return { bgcolor: "error.light", color: "error.main" };
-      default:
-        return { bgcolor: "grey.100", color: "grey.800" };
-    }
-  };
-
   return (
     <ThemeProvider theme={theme}>
       <Box
         sx={{
-          // marginLeft: "550px",/* Match sidebar width */
-          // width: "calc(100% - 250px)",
           minHeight: "100vh",
           bgcolor: "background.default",
           backgroundImage: `linear-gradient(135deg, ${alpha(
@@ -369,367 +380,402 @@ export default function QA() {
         }}
       >
         <Box sx={{ maxWidth: "100vw", mx: "auto" }}>
-          {questionType === "behavioral" && (
-            <BehavioralPopup
-              show={show}
-              onClose={() => {
-                setSessionState("setup");
-                setShow(false);
+          {loading ? (
+            <Box
+              sx={{
+                height: "80vh",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
               }}
-              onStart={startPractice}
-            />
-          )}
-          {questionType === "technical" && (
-            <TechnicalPopup
-              show={show}
-              onClose={() => {
-                setSessionState("setup");
-                setShow(false);
-              }}
-              onStart={startPractice}
-            />
-          )}
-
-          {(sessionState === "question" ||
-            sessionState === "recording" ||
-            sessionState === "reviewing") &&
-            currentQuestion && (
-              <Box sx={{ display: "grid", gap: 3 }}>
-                <Box
-                  sx={{ display: "flex", alignItems: "center", gap: 2,mt:1 }}
-                >
-                  <Button
-                    startIcon={<ArrowBack />}
-                    onClick={() => navigate("/dashboard")}
-                    variant="outlined"
-                    sx={{
-                      mb: 2,
-                      borderRadius: 2,
-                      px: 3,
-                      py: 1,
-                      backdropFilter: "blur(10px)",
-                      backgroundColor: alpha(
-                        theme.palette.background.paper,
-                        0.7
-                      ),
-                      "&:hover": {
-                        backgroundColor: alpha(theme.palette.primary.main, 0.1),
-                      },
-                    }}
-                    aria-label="Back to Dashboard"
-                  >
-                    Back to Dashboard
-                  </Button>
-                </Box>
-                <AnimatedCard>
-                  <CardHeader
-                    title={
-                      <Typography variant="h5" sx={{ fontWeight: "600" }}>
-                         Question
-                      </Typography>
-                    }
-                    action={
-                      sessionState === "question" && (
-                        <Button
-                          variant="outlined"
-                          onClick={skipQuestion}
-                          startIcon={<SkipForwardIcon />}
-                          aria-label="Skip Question"
-                          sx={{
-                            color: "text.secondary",
-                            borderColor: "grey.300",
-                            fontSize: "1.2rem",
-                          }}
-                        >
-                          Skip Question
-                        </Button>
-                      )
-                    }
-                  />
-                  <CardContent>
-                    <Typography variant="h6" sx={{ fontWeight: "400" }}>
-                      {currentQuestion.text}
-                    </Typography>
-                  </CardContent>
-                </AnimatedCard>
-
-                <AnimatedCard>
-                  <CardHeader
-                    title={
-                      <Typography variant="h5" sx={{ fontWeight: "600" }}>
-                        Your Response
-                      </Typography>
-                    }
-                  />
-                  <CardContent sx={{ display: "grid", gap: 3 }}>
-                    {sessionState === "question" && (
-                      <Box sx={{ textAlign: "center", py: 4 }}>
-                        <Button
-                          variant="outlined"
-                          color="primary"
-                          onClick={startRecording}
-                          startIcon={<MicIcon />}
-                          size="large"
-                          aria-label="Start Recording"
-                          sx={{ py: 1.5, fontSize: "1.2rem" }}
-                        >
-                          Start Recording
-                        </Button>
-                        <Typography
-                          variant="caption"
-                          sx={{ mt: 2, display: "block", fontSize: "1rem" }}
-                        >
-                          Click to start recording your response
-                        </Typography>
-                      </Box>
-                    )}
-
-                    {sessionState === "recording" && (
-                      <Box sx={{ display: "grid", gap: 3 }}>
-                        <Box
-                          sx={{
-                            textAlign: "center",
-                            py: 2,
-                            fontSize: "1.2rem",
-                          }}
-                        >
-                          <Box
-                            sx={{
-                              display: "inline-flex",
-                              alignItems: "center",
-                              gap: 1,
-                              px: 3,
-                              py: 1,
-                              bgcolor: "info.light",
-                              color: "#0f766e",
-                              borderRadius: "16px",
-                              fontWeight: 500,
-                            }}
-                          >
-                            <Box
+            >
+              <CircularProgress color="primary" size={70} thickness={5} />
+            </Box>
+          ) : (
+            <>
+              {questionType === "behavioral" && (
+                <BehavioralPopup
+                  show={show}
+                  onClose={() => {
+                    setSessionState("setup");
+                    setShow(false);
+                  }}
+                  onStart={startPractice}
+                />
+              )}
+              {questionType === "technical" && (
+                <TechnicalPopup
+                  show={show}
+                  onClose={() => {
+                    setSessionState("setup");
+                    setShow(false);
+                  }}
+                  onStart={startPractice}
+                />
+              )}
+              {/* --- Rest of your existing UI remains unchanged --- */}
+              {(sessionState === "question" ||
+                sessionState === "recording" ||
+                sessionState === "reviewing") &&
+                currentQuestion && (
+                  <Box sx={{ display: "grid", gap: 3 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 2,
+                        mt: 1,
+                      }}
+                    >
+                      <Button
+                        startIcon={<ArrowBack />}
+                        onClick={() => navigate("/dashboard")}
+                        variant="outlined"
+                        sx={{
+                          mb: 2,
+                          borderRadius: 2,
+                          px: 3,
+                          py: 1,
+                          backdropFilter: "blur(10px)",
+                          backgroundColor: alpha(
+                            theme.palette.background.paper,
+                            0.7
+                          ),
+                          "&:hover": {
+                            backgroundColor: alpha(
+                              theme.palette.primary.main,
+                              0.1
+                            ),
+                          },
+                        }}
+                        aria-label="Back to Dashboard"
+                      >
+                        Back to Dashboard
+                      </Button>
+                    </Box>
+                    <AnimatedCard>
+                      <CardHeader
+                        title={
+                          <Typography variant="h5" sx={{ fontWeight: "600" }}>
+                            Question
+                          </Typography>
+                        }
+                        action={
+                          sessionState === "question" && (
+                            <Button
+                              variant="outlined"
+                              onClick={skipQuestion}
+                              startIcon={<SkipForwardIcon />}
+                              aria-label="Skip Question"
                               sx={{
-                                width: 8,
-                                height: 8,
-                                bgcolor: "#0f766e",
-                                borderRadius: "50%",
-                                animation: `${pulse} 1.5s infinite`,
-                              }}
-                            />
-                            Recording in progress...
-                          </Box>
-                        </Box>
-
-                        {(finalTranscript || interimTranscript) && (
-                          <Box>
-                            <Typography
-                              sx={{
-                                mb: 1,
-                                fontWeight: 400,
+                                color: "text.secondary",
+                                borderColor: "grey.300",
                                 fontSize: "1.2rem",
                               }}
                             >
-                              Live Transcript
-                            </Typography>
-                            <Box
-                              sx={{
-                                p: 2,
-                                bgcolor: "grey.100",
-                                borderRadius: "8px",
-                              }}
+                              Skip Question
+                            </Button>
+                          )
+                        }
+                      />
+                      <CardContent>
+                        <Typography variant="h6" sx={{ fontWeight: "400" }}>
+                          {currentQuestion.text}
+                        </Typography>
+                      </CardContent>
+                    </AnimatedCard>
+
+                    <AnimatedCard>
+                      <CardHeader
+                        title={
+                          <Typography variant="h5" sx={{ fontWeight: "600" }}>
+                            Your Response
+                          </Typography>
+                        }
+                      />
+                      <CardContent sx={{ display: "grid", gap: 3 }}>
+                        {sessionState === "question" && (
+                          <Box sx={{ textAlign: "center", py: 4 }}>
+                            <Button
+                              variant="outlined"
+                              color="primary"
+                              onClick={startRecording}
+                              startIcon={<MicIcon />}
+                              size="large"
+                              aria-label="Start Recording"
+                              sx={{ py: 1.5, fontSize: "1.2rem" }}
                             >
-                              <Typography
-                                variant="h6"
-                                sx={{ fontWeight: "400" }}
-                              >
-                                {finalTranscript + interimTranscript}
-                              </Typography>
-                            </Box>
+                              Start Recording
+                            </Button>
+                            <Typography
+                              variant="caption"
+                              sx={{ mt: 2, display: "block", fontSize: "1rem" }}
+                            >
+                              Click to start recording your response
+                            </Typography>
                           </Box>
                         )}
 
-                        <Button
-                          variant="outlined"
-                          color="error"
-                          onClick={stopRecording}
-                          startIcon={<MicOffIcon />}
-                          aria-label="Stop Recording"
-                          sx={{ py: 1.5, fontSize: "1.2rem" }}
-                        >
-                          Stop Recording
-                        </Button>
-                      </Box>
-                    )}
+                        {sessionState === "recording" && (
+                          <Box sx={{ display: "grid", gap: 3 }}>
+                            <Box
+                              sx={{
+                                textAlign: "center",
+                                py: 2,
+                                fontSize: "1.2rem",
+                              }}
+                            >
+                              <Box
+                                sx={{
+                                  display: "inline-flex",
+                                  alignItems: "center",
+                                  gap: 1,
+                                  px: 3,
+                                  py: 1,
+                                  bgcolor: "info.light",
+                                  color: "#0f766e",
+                                  borderRadius: "16px",
+                                  fontWeight: 500,
+                                }}
+                              >
+                                <Box
+                                  sx={{
+                                    width: 8,
+                                    height: 8,
+                                    bgcolor: "#0f766e",
+                                    borderRadius: "50%",
+                                    animation: `${pulse} 1.5s infinite`,
+                                  }}
+                                />
+                                Recording in progress...
+                              </Box>
+                            </Box>
 
-                    {sessionState === "reviewing" && (
-                      <Box sx={{ display: "grid", gap: 3 }}>
-                        <Box>
-                          <Typography
-                            sx={{ mb: 1, fontWeight: 400, fontSize: "1.2rem" }}
-                          >
-                            Edit Your Response
+                            {(finalTranscript || interimTranscript) && (
+                              <Box>
+                                <Typography
+                                  sx={{
+                                    mb: 1,
+                                    fontWeight: 400,
+                                    fontSize: "1.2rem",
+                                  }}
+                                >
+                                  Live Transcript
+                                </Typography>
+                                <Box
+                                  sx={{
+                                    p: 2,
+                                    bgcolor: "grey.100",
+                                    borderRadius: "8px",
+                                  }}
+                                >
+                                  <Typography
+                                    variant="h6"
+                                    sx={{ fontWeight: "400" }}
+                                  >
+                                    {finalTranscript + interimTranscript}
+                                  </Typography>
+                                </Box>
+                              </Box>
+                            )}
+
+                            <Button
+                              variant="outlined"
+                              color="error"
+                              onClick={stopRecording}
+                              startIcon={<MicOffIcon />}
+                              aria-label="Stop Recording"
+                              sx={{ py: 1.5, fontSize: "1.2rem" }}
+                            >
+                              Stop Recording
+                            </Button>
+                          </Box>
+                        )}
+
+                        {sessionState === "reviewing" && (
+                          <Box sx={{ display: "grid", gap: 3 }}>
+                            <Box>
+                              <Typography
+                                sx={{
+                                  mb: 1,
+                                  fontWeight: 400,
+                                  fontSize: "1.2rem",
+                                }}
+                              >
+                                Edit Your Response
+                              </Typography>
+                              <TextField
+                                value={finalTranscript}
+                                onChange={(e) =>
+                                  setFinalTranscript(e.target.value)
+                                }
+                                multiline
+                                minRows={6}
+                                fullWidth
+                                placeholder="Your response transcript..."
+                                sx={{
+                                  fontWeight: 400,
+                                  fontSize: "6rem",
+                                  "& .MuiInputBase-root": {
+                                    borderRadius: "8px",
+                                  },
+                                }}
+                              />
+                            </Box>
+                            <Box sx={{ display: "flex", gap: 2 }}>
+                              <Button
+                                variant="outlined"
+                                color="primary"
+                                onClick={submitResponse}
+                                startIcon={<SendIcon />}
+                                aria-label="Submit Response"
+                                sx={{ py: 1.5, fontSize: "1.2rem" }}
+                              >
+                                Submit Response
+                              </Button>
+                              <Button
+                                variant="outlined"
+                                onClick={startRecording}
+                                startIcon={<MicIcon />}
+                                aria-label="Record Again"
+                                sx={{ py: 1.5, fontSize: "1.2rem" }}
+                              >
+                                Record Again
+                              </Button>
+                            </Box>
+                          </Box>
+                        )}
+                      </CardContent>
+                    </AnimatedCard>
+                  </Box>
+                )}
+
+              {sessionState === "feedback" && feedback && (
+                <AnimatedCard>
+                  <CardHeader
+                    title={<Typography variant="h6">Feedback</Typography>}
+                  />
+                  <CardContent sx={{ display: "grid", gap: 3 }}>
+                    <Box
+                      sx={{
+                        display: "grid",
+                        gap: 2,
+                        gridTemplateColumns: {
+                          xs: "1fr",
+                          sm: "1fr 1fr",
+                          lg: "1fr 1fr 1fr 1fr",
+                        },
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          textAlign: "center",
+                          p: 3,
+                          bgcolor:
+                            "linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%)",
+                          borderRadius: "8px",
+                          transition: "all 0.2s ease",
+                          "&:hover": { transform: "scale(1.03)" },
+                        }}
+                      >
+                        <Typography variant="h4" color="primary">
+                          {feedback.overallScore}%
+                        </Typography>
+                        <Typography variant="h6">Overall Score</Typography>
+                      </Box>
+                      <Box
+                        sx={{
+                          textAlign: "center",
+                          p: 3,
+                          bgcolor:
+                            "linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)",
+                          borderRadius: "8px",
+                          transition: "all 0.2s ease",
+                          "&:hover": { transform: "scale(1.03)" },
+                        }}
+                      >
+                        <Typography variant="h4" sx={{ color: "error.main" }}>
+                          {feedback.fillerWords}
+                        </Typography>
+                        <Typography variant="h6">Filler Words</Typography>
+                      </Box>
+                      <Box
+                        sx={{
+                          textAlign: "center",
+                          p: 3,
+                          bgcolor:
+                            "linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)",
+                          borderRadius: "8px",
+                          transition: "all 0.2s ease",
+                          "&:hover": { transform: "scale(1.03)" },
+                        }}
+                      >
+                        <Typography variant="h4" sx={{ color: "#d97706" }}>
+                          {feedback.weakWords}
+                        </Typography>
+                        <Typography variant="h6">Weak Words</Typography>
+                      </Box>
+                    </Box>
+
+                    <Divider />
+
+                    <Box sx={{ display: "grid", gap: 3 }}>
+                      <Box>
+                        <Typography
+                          variant="subtitle1"
+                          sx={{ fontWeight: 600, mb: 1 }}
+                        >
+                          Summary
+                        </Typography>
+                        <Typography variant="body1" color="text.secondary">
+                          {feedback.summary}
+                        </Typography>
+                      </Box>
+                      <Box>
+                        <Typography
+                          variant="subtitle1"
+                          sx={{ fontWeight: 600, mb: 1 }}
+                        >
+                          Sample Response
+                        </Typography>
+                        <Box
+                          sx={{
+                            p: 2,
+                            bgcolor: "grey.100",
+                            borderRadius: "8px",
+                          }}
+                        >
+                          <Typography variant="body1">
+                            {feedback.sampleResponse}
                           </Typography>
-                          <TextField
-                            value={finalTranscript}
-                            onChange={(e) => setFinalTranscript(e.target.value)}
-                            multiline
-                            minRows={6}
-                            fullWidth
-                            placeholder="Your response transcript..."
-                            sx={{
-                              fontWeight: 400,
-                              fontSize: "6rem",
-                              "& .MuiInputBase-root": { borderRadius: "8px" },
-                            }}
-                          />
-                        </Box>
-                        <Box sx={{ display: "flex", gap: 2 }}>
-                          <Button
-                            variant="outlined"
-                            color="primary"
-                            onClick={submitResponse}
-                            startIcon={<SendIcon />}
-                            aria-label="Submit Response"
-                            sx={{ py: 1.5, fontSize: "1.2rem" }}
-                          >
-                            Submit Response
-                          </Button>
-                          <Button
-                            variant="outlined"
-                            onClick={startRecording}
-                            startIcon={<MicIcon />}
-                            aria-label="Record Again"
-                            sx={{ py: 1.5, fontSize: "1.2rem" }}
-                          >
-                            Record Again
-                          </Button>
                         </Box>
                       </Box>
-                    )}
+                    </Box>
+
+                    <Box sx={{ display: "flex", gap: 2, pt: 2 }}>
+                      <Button
+                        variant="outlined"
+                        color="primary"
+                        onClick={practiceAnother}
+                        startIcon={<RotateCcwIcon />}
+                        aria-label="Practice Another Question"
+                        sx={{ py: 1.5, fontSize: "1.2rem" }}
+                      >
+                        Practice Another Question
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        onClick={startPractice}
+                        aria-label="Same Type & Difficulty"
+                        sx={{ py: 1.5, fontSize: "1.2rem" }}
+                      >
+                        Same Type & Difficulty
+                      </Button>
+                    </Box>
                   </CardContent>
                 </AnimatedCard>
-              </Box>
-            )}
-
-          {sessionState === "feedback" && feedback && (
-            <AnimatedCard>
-              <CardHeader
-                title={<Typography variant="h6">Feedback</Typography>}
-              />
-              <CardContent sx={{ display: "grid", gap: 3 }}>
-                <Box
-                  sx={{
-                    display: "grid",
-                    gap: 2,
-                    gridTemplateColumns: {
-                      xs: "1fr",
-                      sm: "1fr 1fr",
-                      lg: "1fr 1fr 1fr 1fr",
-                    },
-                  }}
-                >
-                  <Box
-                    sx={{
-                      textAlign: "center",
-                      p: 3,
-                      bgcolor:
-                        "linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%)",
-                      borderRadius: "8px",
-                      transition: "all 0.2s ease",
-                      "&:hover": { transform: "scale(1.03)" },
-                    }}
-                  >
-                    <Typography variant="h4" color="primary">
-                      {feedback.overallScore}%
-                    </Typography>
-                    <Typography variant="h6">Overall Score</Typography>
-                  </Box>
-                  <Box
-                    sx={{
-                      textAlign: "center",
-                      p: 3,
-                      bgcolor:
-                        "linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)",
-                      borderRadius: "8px",
-                      transition: "all 0.2s ease",
-                      "&:hover": { transform: "scale(1.03)" },
-                    }}
-                  >
-                    <Typography variant="h4" sx={{ color: "error.main" }}>
-                      {feedback.fillerWords}
-                    </Typography>
-                    <Typography variant="h6">Filler Words</Typography>
-                  </Box>
-                  <Box
-                    sx={{
-                      textAlign: "center",
-                      p: 3,
-                      bgcolor:
-                        "linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)",
-                      borderRadius: "8px",
-                      transition: "all 0.2s ease",
-                      "&:hover": { transform: "scale(1.03)" },
-                    }}
-                  >
-                    <Typography variant="h4" sx={{ color: "#d97706" }}>
-                      {feedback.weakWords}
-                    </Typography>
-                    <Typography variant="h6">Weak Words</Typography>
-                  </Box>
-                </Box>
-
-                <Divider />
-
-                <Box sx={{ display: "grid", gap: 3 }}>
-                  <Box>
-                    <Typography
-                      variant="subtitle1"
-                      sx={{ fontWeight: 600, mb: 1 }}
-                    >
-                      Summary
-                    </Typography>
-                    <Typography variant="body1" color="text.secondary">
-                      {feedback.summary}
-                    </Typography>
-                  </Box>
-                  <Box>
-                    <Typography
-                      variant="subtitle1"
-                      sx={{ fontWeight: 600, mb: 1 }}
-                    >
-                      Sample Response
-                    </Typography>
-                    <Box
-                      sx={{ p: 2, bgcolor: "grey.100", borderRadius: "8px" }}
-                    >
-                      <Typography variant="body1">
-                        {feedback.sampleResponse}
-                      </Typography>
-                    </Box>
-                  </Box>
-                </Box>
-
-                <Box sx={{ display: "flex", gap: 2, pt: 2 }}>
-                  <Button
-                    variant="outlined"
-                    color="primary"
-                    onClick={practiceAnother}
-                    startIcon={<RotateCcwIcon />}
-                    aria-label="Practice Another Question"
-                    sx={{ py: 1.5, fontSize: "1.2rem" }}
-                  >
-                    Practice Another Question
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    onClick={startPractice}
-                    aria-label="Same Type & Difficulty"
-                    sx={{ py: 1.5, fontSize: "1.2rem" }}
-                  >
-                    Same Type & Difficulty
-                  </Button>
-                </Box>
-              </CardContent>
-            </AnimatedCard>
+              )}
+            </>
           )}
         </Box>
       </Box>

@@ -23,6 +23,8 @@ import QAndA from "../pages/q&a/QAndA";
 import BehavioralPopup from "../pages/q&a/BehavioralPopup";
 import TechnicalPopup from "../pages/q&a/TechnicalPopup";
 import Interview from "../pages/interview/Interview";
+import BehavioralInterview from "../pages/interview/BehavioralPopup";
+import TechnicalInterview from "../pages/interview/TechnicalInterview";
 import Analytics from "../pages/analytics/Analytics";
 import Archive from "../pages/archive/Archive";
 import Profile from "../pages/profile/Profile";
@@ -96,6 +98,22 @@ const routes = [
         element: (
           <ProtectedRoute>
           <Interview />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/behavioral-interview",
+        element: (
+          <ProtectedRoute>
+          <BehavioralInterview />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/technical-interview",
+        element: (
+          <ProtectedRoute>
+          <TechnicalInterview />
           </ProtectedRoute>
         ),
       },

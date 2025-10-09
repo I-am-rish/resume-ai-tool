@@ -54,6 +54,20 @@ export const menuList = [
     name: "interview",
     path: "/interview",
     icon: "feather-video",
+    dropdownMenu: [
+      {
+        id: 1,
+        name: "Behavioral",
+        path: "behavioral-interview",
+        subdropdownMenu: false,
+      },
+      {
+        id: 2,
+        name: "Technical",
+        path: "technical-interview",
+        subdropdownMenu: false,
+      },
+    ],
   },
   {
     id: 5,
