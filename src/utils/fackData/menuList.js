@@ -11,14 +11,7 @@ export const menuList = [
     name: "resume",
     icon: "feather-file-text",
     path: "/resume",
-    // dropdownMenu: [
-    //   {
-    //     id: 1,
-    //     name: "Resume",
-    //     path: "/resume",
-    //     subdropdownMenu: false,
-    //   },
-    // ],
+    
   },
 
   {
@@ -29,7 +22,7 @@ export const menuList = [
   },
   {
     id: 3,
-    name: "Q&A",
+    name: "q&a",
     path: "#",
     // path: "/q-and-a",
     icon: "feather-message-square",
@@ -37,13 +30,13 @@ export const menuList = [
       {
         id: 1,
         name: "Behavioral",
-        path: "behavioral",
+        path: "/q&a/behavioral",
         subdropdownMenu: false,
       },
       {
         id: 2,
         name: "Technical",
-        path: "technical",
+        path: "/q&a/technical",
         subdropdownMenu: false,
       },
     ],
@@ -52,19 +45,19 @@ export const menuList = [
   {
     id: 4,
     name: "interview",
-    path: "/interview",
+    path: "#",
     icon: "feather-video",
     dropdownMenu: [
       {
         id: 1,
         name: "Behavioral",
-        path: "behavioral-interview",
+        path: "/interview/behavioral",
         subdropdownMenu: false,
       },
       {
         id: 2,
         name: "Technical",
-        path: "technical-interview",
+        path: "/interview/technical",
         subdropdownMenu: false,
       },
     ],

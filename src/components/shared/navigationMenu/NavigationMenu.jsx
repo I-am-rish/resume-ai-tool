@@ -20,7 +20,7 @@ const NavigationManu = () => {
     >
       <div className="navbar-wrapper">
         <div className="m-header">
-          <Link to="/" className="b-brand ">
+          <Link to="/dashboard" className="b-brand ">
             {/* <!-- ========   change your logo hear   ============ --> */}
             <img src={logo} alt="logo" className="logo logo-lg" width="80%" />
             {/* <img src="/images/logo-abbr.png" alt="logo" className="logo logo-sm" /> */}

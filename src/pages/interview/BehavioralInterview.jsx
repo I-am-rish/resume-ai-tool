@@ -1,45 +1,42 @@
 import { useState, useRef, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import TechPopup from "./TechPopup";
-import BehavioralPractice from "./BehavPopup";
-import httpClient from "@/utils/httpClinet";
 
-const InterviewScreen = () => {
+const BehavioralInterviewScreen = () => {
   const [recording, setRecording] = useState(false);
   const [timer, setTimer] = useState(0);
   const [intervalId, setIntervalId] = useState(null);
-  const [sarahMessage, setSarahMessage] = useState("Sarah’s message...");
+  const [sarahMessage, setSarahMessage] = useState("Sarah's message...");
   const [alexMessage, setAlexMessage] = useState("");
   const [mediaRecorder, setMediaRecorder] = useState(null);
   const [isMuted, setIsMuted] = useState(false);
   const [startEnabled, setStartEnabled] = useState(false);
-  const [micAccess, setMicAccess] = useState(null);
-  const [showPopup, setShowPopup] = useState(true);
+  const [micAccess, setMicAccess] = useState(null); // Track microphone access status
 
   const chunks = useRef([]);
-  const recognitionRef = useRef(null); // ✅ For SpeechRecognition instance
 
+  // Behavioral interview questions for Sarah (System)
   const interviewQuestions = [
-    "Can you tell me about yourself?",
-    "What are your greatest strengths and weaknesses?",
-    "Why do you want to work at this company?",
-    "Tell me about a challenging project you worked on.",
-    "Where do you see yourself in the next five years?",
-    "How do you handle working under pressure?",
-    "What is your biggest professional achievement?",
-    "Why should we hire you?",
-    "Tell me about a time you resolved a conflict at work.",
-    "What do you know about our company?",
+    "Tell me about a time you faced a challenging situation at work.",
+    "Describe a situation where you had to work with a difficult team member.",
+    "Give an example of a time when you had to meet a tight deadline.",
+    "Tell me about a mistake you made and how you handled it.",
+    "Describe a time when you had to adapt to a change at work.",
+    "Tell me about a time you received constructive criticism.",
+    "Give an example of how you motivated others.",
+    "Describe a situation where you had to resolve a conflict.",
+    "Tell me about a time you went above and beyond for a customer.",
+    "Describe a challenging project you worked on and how you overcame obstacles.",
   ];
 
+  // Format timer (MM:SS)
   const formatTime = (seconds) => {
     const min = String(Math.floor(seconds / 60)).padStart(2, "0");
     const sec = String(seconds % 60).padStart(2, "0");
     return `${min}:${sec}`;
   };
 
-  // ✅ Start Recording + Speech-to-Text
+  // Start Recording
   const startRecording = async () => {
     if (!navigator.mediaDevices || !window.MediaRecorder) {
       alert("Your browser does not support audio recording.");
@@ -48,7 +45,7 @@ const InterviewScreen = () => {
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      setMicAccess(true);
+      setMicAccess(true); // Microphone access granted
       const recorder = new MediaRecorder(stream);
       setMediaRecorder(recorder);
 
@@ -59,7 +56,7 @@ const InterviewScreen = () => {
         const blob = new Blob(chunks.current, { type: "audio/webm" });
         console.log("Recorded Audio Blob:", blob);
         chunks.current = [];
-        stream.getTracks().forEach((track) => track.stop());
+        stream.getTracks().forEach((track) => track.stop()); // Stop all tracks
       };
       recorder.onerror = (e) => {
         console.error("MediaRecorder error:", e);
@@ -70,71 +67,36 @@ const InterviewScreen = () => {
 
       recorder.start();
       setRecording(true);
+
       const id = setInterval(() => setTimer((t) => t + 1), 1000);
       setIntervalId(id);
-
-      // ✅ Initialize Speech Recognition
-      const SpeechRecognition =
-        window.SpeechRecognition || window.webkitSpeechRecognition;
-
-      if (!SpeechRecognition) {
-        alert("Speech recognition is not supported in this browser.");
-        return;
-      }
-
-      const recognition = new SpeechRecognition();
-      recognition.continuous = true;
-      recognition.interimResults = true;
-      recognition.lang = "en-US";
-      recognitionRef.current = recognition;
-
-      recognition.onresult = (event) => {
-        let transcript = "";
-        for (let i = event.resultIndex; i < event.results.length; ++i) {
-          transcript += event.results[i][0].transcript;
-        }
-        setAlexMessage(transcript);
-      };
-
-      recognition.onerror = (event) => {
-        console.error("SpeechRecognition error:", event.error);
-      };
-
-      recognition.start(); // ✅ Start listening
-      console.log("Speech recognition started");
-
     } catch (err) {
-      setMicAccess(false);
+      setMicAccess(false); // Microphone access denied or unavailable
       alert("Microphone access denied or unavailable. Please check your microphone settings.");
       console.error("Microphone error:", err);
     }
   };
 
-  // ✅ Stop Recording + Stop Speech Recognition
+  // Stop Recording
   const stopRecording = () => {
     if (mediaRecorder && mediaRecorder.state !== "inactive") {
       mediaRecorder.stop();
     }
-
-    if (recognitionRef.current) {
-      recognitionRef.current.stop();
-      console.log("Speech recognition stopped");
-    }
-
     clearInterval(intervalId);
     setRecording(false);
     setIntervalId(null);
-    setMicAccess(null);
+    setMicAccess(null); // Reset mic access status
   };
 
   const toggleMute = () => setIsMuted((prev) => !prev);
 
   const handleSubmit = () => {
     alert(
-      `Interview submitted!\n\nSarah: ${sarahMessage}\nAlex: ${alexMessage}`
+      `Behavioral Interview submitted!\n\nSarah: ${sarahMessage}\nAlex: ${alexMessage}`
     );
   };
 
+  // Speak the text aloud
   const speakQuestion = (text) => {
     if ("speechSynthesis" in window) {
       const utterance = new SpeechSynthesisUtterance(text);
@@ -143,68 +105,45 @@ const InterviewScreen = () => {
       utterance.rate = 1;
       utterance.pitch = 1;
       window.speechSynthesis.speak(utterance);
+    } else {
+      console.warn("Text-to-speech not supported in this browser.");
     }
   };
 
-
+  // Simulate Sarah asking a question on component mount
   useEffect(() => {
-    httpClient.post(`/interviewQuestions/68e010029199f38a9ae080ed`, {questionType: "technical", response: [],
-}).then(res => {
-      console.log("interviewQuestions api res => ", res.data.data);
-      localStorage.setItem("interviewQuestions", JSON.stringify(res.data.data));
-    }).catch(err => {
-      console.log("interviewQuestions api err => ", err);
-    })
-  }, [])
+    const randomQuestion =
+      interviewQuestions[
+        Math.floor(Math.random() * interviewQuestions.length)
+      ];
 
-  const currentPath = window.location.pathname;
-  const isTechnical = currentPath.includes("/technical");
-  const isBehavioral = currentPath.includes("/behavioral");
+    setSarahMessage("...");
+    setStartEnabled(false);
 
+    setTimeout(() => {
+      let displayedText = "";
+      let index = 0;
 
-  useEffect(() => {
-    // const randomQuestion =
-    //   interviewQuestions[Math.floor(Math.random() * interviewQuestions.length)];
+      const typingInterval = setInterval(() => {
+        displayedText += randomQuestion[index];
+        setSarahMessage(displayedText);
+        index++;
 
-    // setSarahMessage("...");
-    // setStartEnabled(false);
-
-    // setTimeout(() => {
-    //   let displayedText = "";
-    //   let index = 0;
-
-    //   const typingInterval = setInterval(() => {
-    //     displayedText += randomQuestion[index];
-    //     setSarahMessage(displayedText);
-    //     index++;
-
-    //     if (index === randomQuestion.length) {
-    //       clearInterval(typingInterval);
-    //       speakQuestion(randomQuestion);
-    //       setTimeout(() => setStartEnabled(true), 1000);
-    //     }
-    //   }, 50);
-    // }, 1000);
+        if (index === randomQuestion.length) {
+          clearInterval(typingInterval);
+          speakQuestion(randomQuestion);
+          setTimeout(() => setStartEnabled(true), 1000);
+        }
+      }, 50);
+    }, 1000);
   }, []);
 
+  // Reset timer after stopping
   useEffect(() => {
     if (!recording && timer !== 0 && !intervalId) {
       setTimer(0);
     }
   }, [recording]);
-
-  const handlePopupStart = (type, duration) => {
-    setShowPopup(false);
-    console.log(`Starting ${type} interview with ${duration} minutes`);
-  };
-
-  if (showPopup) {
-    if (isTechnical) {
-      return <TechPopup onStart={handlePopupStart} />;
-    } else if (isBehavioral) {
-      return <BehavioralPractice onStart={handlePopupStart} />;
-    }
-  }
 
   return (
     <div
@@ -217,10 +156,10 @@ const InterviewScreen = () => {
       {/* Header */}
       <div className="d-flex justify-content-between align-items-center w-100 mb-5">
         <button className="btn btn-outline-secondary btn-sm fs-6">
-          <i className="bi bi-arrow-left fs-5"></i> Back
+          <i className="bi bi-arrow-left fs-5"></i> Back to Dashboard
         </button>
 
-        <h2 className="fw-bold m-0">Interview</h2>
+        <h2 className="fw-bold m-0">Behavioral Interview</h2>
 
         <div className="d-flex align-items-center gap-3">
           <i
@@ -343,4 +282,4 @@ const InterviewScreen = () => {
   );
 };
 
-export default InterviewScreen;
+export default BehavioralInterviewScreen;

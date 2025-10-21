@@ -20,15 +20,12 @@ import Landing from "../pages/landing-page/Landing";
 import Resume from "../pages/resume/Resume";
 import CoverLetter from "../pages/cover-letter/CoverLetter";
 import QAndA from "../pages/q&a/QAndA";
-import BehavioralPopup from "../pages/q&a/BehavioralPopup";
-import TechnicalPopup from "../pages/q&a/TechnicalPopup";
 import Interview from "../pages/interview/Interview";
-import BehavioralInterview from "../pages/interview/BehavioralPopup";
-import TechnicalInterview from "../pages/interview/TechnicalInterview";
 import Analytics from "../pages/analytics/Analytics";
 import Archive from "../pages/archive/Archive";
 import Profile from "../pages/profile/Profile";
 import Logout from "../pages/Logout";
+import TechInterview from "../pages/interview/TechInterview";
 
 const routes = [
   {
@@ -78,7 +75,7 @@ const routes = [
       //   ),
       // },
       {
-        path: "/behavioral",
+        path: "/q&a/behavioral",
         element: (
           <ProtectedRoute>
           <QAndA />
@@ -86,7 +83,7 @@ const routes = [
         ),
       },
       {
-        path: "/technical",
+        path: "/q&a/technical",
         element: (
           <ProtectedRoute>
           <QAndA />
@@ -102,18 +99,27 @@ const routes = [
         ),
       },
       {
-        path: "/behavioral-interview",
+        path: "/interview/behavioral",
         element: (
           <ProtectedRoute>
-          <BehavioralInterview />
+          <Interview />
           </ProtectedRoute>
         ),
       },
       {
-        path: "/technical-interview",
+        path: "/interview/technical",
         element: (
           <ProtectedRoute>
-          <TechnicalInterview />
+           {/* <TechInterview /> */}
+            <Interview />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/interview",
+        element: (
+          <ProtectedRoute>
+          <Interview />
           </ProtectedRoute>
         ),
       },

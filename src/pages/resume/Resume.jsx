@@ -317,21 +317,21 @@ export default function Resume() {
 
   const [resume, setResume] = useState(null);
   const [analysisData, setAnalysisData] = useState(null);
-  // const fetchResume = async () => {
-  //   return httpClient
-  //     .get(`/get-resume/68e010029199f38a9ae080ed`)
-  //     .then((res) => {
-  //       console.log("resume api res => ", res.data.data[0]);
-  //       setResume(res.data.data[0]);
-  //     })
-  //     .catch((err) => {
-  //       console.log("resume api err => ", err);
-  //     });
-  // };
+  const fetchResume = async () => {
+    return httpClient
+      .get(`/get-resume/68e010029199f38a9ae080ed`)
+      .then((res) => {
+        console.log("resume api res => ", res.data.data[0]);
+        setResume(res.data.data[0]);
+      })
+      .catch((err) => {
+        console.log("resume api err => ", err);
+      });
+  };
 
-  // useEffect(() => {
-  //   fetchResume();
-  // }, []);
+  useEffect(() => {
+    fetchResume();
+  }, []);
 
   const handleUpdateResume = () => {
     setChangesSaved(false);
@@ -395,7 +395,7 @@ export default function Resume() {
           p: { xs: 2, md: 4 },
         }}
       >
-        <Box sx={{ maxWidth: "1400px", mx: "auto" }}>
+        <Box sx={{ maxWidth: "1400px", }}>
           {/* Header Section */}
           <Box
             sx={{

@@ -531,7 +531,7 @@ export default function Dashboard() {
     httpClient
       .get(`get-all-upload-resumes`)
       .then((res) => {
-        console.log(res.data.data);
+        console.log("dashboard api ", res);
         setRecords(res.data.data);
       })
       .catch((err) => {
@@ -540,8 +540,12 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <>
-      <Header />
+    <div className="" 
+    // style={{
+    //   marginTop: "-5rem"
+    // }}
+    >
+      <Header/>
       <ThemeProvider theme={theme}>
         <Box
           sx={{
@@ -993,6 +997,6 @@ export default function Dashboard() {
           />
         </Box>
       </ThemeProvider>
-    </>
+    </div>
   );
 }
