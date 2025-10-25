@@ -2,6 +2,7 @@ import axios from "axios";
 
 const httpClient = axios.create({
   baseURL: "http://localhost:7777/api/v1/user", // local server
+  // baseURL: "http://172.16.2.48:7777/api/v1/user", // local server
 });
 
 // Request interceptor

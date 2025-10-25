@@ -51,11 +51,11 @@ const Menus = () => {
                         className={`nxl-item nxl-hasmenu ${activeParent === name ? "active nxl-trigger" : ""}`}
                     >
                         <Link to={path} className="nxl-link text-capitalize">
-                            <span className="nxl-micon"> {getIcon(icon)} </span>
-                            <span className="nxl-mtext" style={{ paddingLeft: "2.5px" }}>
+                            <span className="nxl-micon fs-2"> {getIcon(icon)} </span>
+                            <span className="nxl-mtext" style={{ paddingLeft: "2.5px", fontSize: "18px"}}>
                                 {name}
                             </span>
-                            <span className="nxl-arrow fs-16">
+                            <span className="nxl-arrow fs-20">
                                 <FiChevronRight />
                             </span>
                         </Link>
@@ -110,7 +110,11 @@ const Menus = () => {
                                                 className={`nxl-item ${pathName === path ? "active" : ""
                                                     }`}
                                             >
-                                                <Link className="nxl-link" to={path}>
+                                                <Link className="nxl-link fs-6" to={path}
+                                                style={{
+                                                    color:" #4e4c4c"
+                                                }}
+                                                >
                                                     {name}
                                                 </Link>
                                             </li>

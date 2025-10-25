@@ -81,8 +81,8 @@ function BehavioralPractice({ onStart }) {
                 backgroundColor: "white",
               }}
             >
-              <MenuItem value="20">20 minutes (4 questions)</MenuItem>
-              <MenuItem value="30">30 minutes (6 questions)</MenuItem>
+              <MenuItem value="20">20 minutes </MenuItem>
+              <MenuItem value="30">30 minutes </MenuItem>
             </Select>
           </FormControl>
 
@@ -91,7 +91,7 @@ function BehavioralPractice({ onStart }) {
             color="text.secondary"
             sx={{ mt: 3, textAlign: "center", fontWeight: 500 }}
           >
-            {durationDescription}
+            {/* {durationDescription} */}
           </Typography>
 
           <Typography

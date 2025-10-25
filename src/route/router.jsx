@@ -27,6 +27,8 @@ import Profile from "../pages/profile/Profile";
 import Logout from "../pages/Logout";
 import TechInterview from "../pages/interview/TechInterview";
 
+import InterviewResult from "../pages/interview/InterviewResult";
+
 const routes = [
   {
     path: "/",
@@ -120,6 +122,14 @@ const routes = [
         element: (
           <ProtectedRoute>
           <Interview />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/interview/result",
+        element: (
+          <ProtectedRoute>
+          <InterviewResult />
           </ProtectedRoute>
         ),
       },
