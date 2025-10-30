@@ -321,8 +321,8 @@ export default function Resume() {
     return httpClient
       .get(`/get-resume/68e010029199f38a9ae080ed`)
       .then((res) => {
-        console.log("resume api res => ", res.data.data[0]);
-        setResume(res.data.data[0]);
+        console.log("resume api res => ", res.data?.data);
+        setResume(res.data.data);
       })
       .catch((err) => {
         console.log("resume api err => ", err);
@@ -351,7 +351,7 @@ export default function Resume() {
   };
 
   useEffect(() => {
-    // fetchAnalysis();
+    fetchAnalysis();
   }, []);
 
   const handleSaveChanges = () => {
@@ -744,7 +744,7 @@ export default function Resume() {
               />
               <CardContent>
                 <List disablePadding>
-                  {analysisData?.["ats_compliance_recommendations"].map(
+                  {analysisData?.["ats_compliance_recommendations"]?.map(
                     (achievement, index) => (
                       <StyledListItem key={index} disablePadding>
                         <ListItemIcon>
@@ -778,7 +778,7 @@ export default function Resume() {
               />
               <CardContent>
                 <List disablePadding>
-                  {analysisData?.["recommended updates"].map(
+                  {analysisData?.["recommended_updates"]?.map(
                     (recommendation, index) => (
                       <StyledListItem key={index} disablePadding>
                         <ListItemIcon>

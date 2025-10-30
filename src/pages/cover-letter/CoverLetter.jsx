@@ -113,6 +113,7 @@ export default function CoverLetter() {
         const res = await httpClient.post(
           `/write-cover-letter/68e010029199f38a9ae080ed`
         );
+        console.log("cover letter api res =>", res.data.data);
         setCoverLetters(res.data.data || {});
       } catch (err) {
         console.error("cover letter api error =>", err);
